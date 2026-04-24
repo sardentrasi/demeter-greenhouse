@@ -69,7 +69,7 @@ MOISTURE_SAFETY_LIMIT = int(os.getenv("MOISTURE_SAFETY_LIMIT", 70))
 
 # GLOBAL VARIABLES
 LATEST_DATA = {
-    "moisture": 0, "temp": 0, "last_seen": datetime.min,
+    "moisture": 0, "temp": 0, "humidity": 0, "last_seen": datetime.min,
     "action": "WAITING", "status": "BOOT"
 }
 LAST_LOG_TIME = datetime.min

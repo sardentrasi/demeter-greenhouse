@@ -36,10 +36,11 @@ def handle_report():
         data = request.json
         moist = data.get("moisture", 0)
         temp = data.get("temp", 0)
+        humidity = data.get("humidity", 0)
         
         current_time = datetime.now()
         
-        logger.info(f"📥 [ESP32] Laporan: Moisture={moist}%, Temp={temp}°C")
+        logger.info(f"📥 [ESP32] Laporan: Moisture={moist}%, Temp={temp}°C, Hum={humidity}%")
         
         # Priority 1: User Request
         if core.state.COMMAND_QUEUE:
@@ -63,7 +64,7 @@ def handle_report():
                         core.state.NEXT_ANALYSIS_TIME = current_time + timedelta(hours=SOFT_COOLDOWN_HOURS)
                         status_msg = f"User Request: Analyzed (+{SOFT_COOLDOWN_HOURS}h)"
                         
-                    log_data(moist, temp, action, img_path)
+                    log_data(moist, temp, action, img_path, humidity)
                     
                     reasoning = ai_result.get("reason", "Manual Override Evaluated")
                     update_short_memory("User Commanded Check", f"Result: {action} | {reasoning}")
@@ -146,7 +147,7 @@ def handle_report():
                         save_to_disk = True
 
                     if save_to_disk:
-                        log_data(moist, temp, action, img_path)
+                        log_data(moist, temp, action, img_path, humidity)
                         
                         if task_type == 'AUTO':
                             reason = ai_result.get('reason', 'Routine check')
@@ -173,7 +174,7 @@ def handle_report():
                 update_short_memory("System Error", str(e))
 
             core.state.LATEST_DATA = {
-                "moisture": moist, "temp": temp, "last_seen": current_time,
+                "moisture": moist, "temp": temp, "humidity": humidity, "last_seen": current_time,
                 "action": action, "status": status_msg
             }
 
@@ -181,7 +182,7 @@ def handle_report():
 
         status_msg = "Sistem Sehat"
         core.state.LATEST_DATA = {
-            "moisture": moist, "temp": temp, "last_seen": current_time,
+            "moisture": moist, "temp": temp, "humidity": humidity, "last_seen": current_time,
             "action": "DIAM", "status": status_msg
         }
 
@@ -230,6 +231,7 @@ def api_status():
     return jsonify({
         "moisture": core.state.LATEST_DATA.get("moisture", 0),
         "temp": core.state.LATEST_DATA.get("temp", 0),
+        "humidity": core.state.LATEST_DATA.get("humidity", 0),
         "last_seen": core.state.LATEST_DATA.get("last_seen").isoformat() if isinstance(core.state.LATEST_DATA.get("last_seen"), datetime) else None,
         "action": core.state.LATEST_DATA.get("action", "WAITING"),
         "status": core.state.LATEST_DATA.get("status", "BOOT"),
@@ -251,7 +253,8 @@ def api_history():
                             "timestamp": parts[0],
                             "moisture": float(parts[1]) if parts[1].replace('.','',1).isdigit() else 0,
                             "temp": float(parts[2]) if parts[2].replace('.','',1).isdigit() else 0,
-                            "action": parts[3]
+                            "action": parts[3],
+                            "humidity": float(parts[5]) if len(parts) >= 6 and parts[5].replace('.','',1).isdigit() else 0
                         })
     except Exception as e:
         logger.error(f"[ERROR] API History: {e}")

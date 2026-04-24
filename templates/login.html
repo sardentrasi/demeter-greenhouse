@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Demeter AI - Login</title>
+    <title>Demeter Greenhouse - Login</title>
     <!-- Use Google Fonts as fallback for Wise Sans / Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -88,11 +88,11 @@
 
         <form action="{{ url_for('login') }}" method="POST">
             <div class="form-group">
-                <label for="username">Operator ID (Username)</label>
+                <label for="username">Operator ID</label>
                 <input type="text" id="username" name="username" class="form-control" placeholder="Enter username..." required autofocus>
             </div>
             <div class="form-group">
-                <label for="password">Security Protocol (Password)</label>
+                <label for="password">Security Protocol</label>
                 <input type="password" id="password" name="password" class="form-control" placeholder="Enter password..." required>
             </div>
             <button type="submit" class="btn-primary btn-block">Login to System</button>

@@ -73,7 +73,7 @@ def start_midnight_cleanup_scheduler() -> None:
     scheduler_thread.start()
     logger.info("🕒 Midnight Cleanup Scheduler initialized.")
 
-def log_data(moist, temp, action, img_path):
+def log_data(moist, temp, action, img_path, humidity=0):
     from core.state import DB_FILE
     try:
         current_time = datetime.now()
@@ -82,7 +82,7 @@ def log_data(moist, temp, action, img_path):
         
         with open(DB_FILE, 'a') as f:
             if not file_exists:
-                f.write("timestamp,moisture,temp,action,img_path\n")
-            f.write(f"{current_time.strftime('%Y-%m-%d %H:%M:%S')},{moist},{temp},{action},{img_path}\n")
+                f.write("timestamp,moisture,temp,action,img_path,humidity\n")
+            f.write(f"{current_time.strftime('%Y-%m-%d %H:%M:%S')},{moist},{temp},{action},{img_path},{humidity}\n")
     except Exception as e:
         logger.error(f"❌ Failed to log data to CSV: {e}", exc_info=True)

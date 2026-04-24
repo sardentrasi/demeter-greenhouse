@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // DOM Elements
     const moistVal = document.getElementById('moisture-val');
     const tempVal = document.getElementById('temp-val');
+    const humidityVal = document.getElementById('humidity-val');
     const actionBadge = document.getElementById('action-badge');
     const statusDesc = document.getElementById('status-desc');
     const lastSeenTime = document.getElementById('last-seen-time');
@@ -18,6 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             moistVal.textContent = data.moisture;
             tempVal.textContent = data.temp;
+            if (humidityVal) humidityVal.textContent = data.humidity;
             
             // Format time
             if (data.last_seen) {
@@ -69,12 +71,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 const tdTemp = document.createElement('td');
                 tdTemp.textContent = row.temp + '°C';
                 
+                const tdHum = document.createElement('td');
+                tdHum.textContent = (row.humidity || 0) + '%';
+                
                 const tdAction = document.createElement('td');
                 tdAction.textContent = row.action;
                 
                 tr.appendChild(tdTime);
                 tr.appendChild(tdMoist);
                 tr.appendChild(tdTemp);
+                tr.appendChild(tdHum);
                 tr.appendChild(tdAction);
                 
                 historyTbody.appendChild(tr);
