@@ -19,7 +19,8 @@ from core.ai_consultant import consult_demeter
 from core.telegram_bot import run_telegram_bot, kirim_telegram_sync
 from core.database import (
     init_db, get_latest_history, get_sensor_timeseries, get_sensor_stats,
-    get_daily_reports, insert_notification, get_unread_notifications, mark_notifications_read
+    get_daily_reports, insert_notification, get_unread_notifications, mark_notifications_read,
+    insert_growth_log, get_growth_logs
 )
 
 load_dotenv()
@@ -263,6 +264,38 @@ def api_history():
 @login_required
 def serve_capture(filename):
     return send_from_directory(CAPTURE_DIR, filename)
+
+# --- GROWTH LOGS ---
+@app.route('/growth-log')
+@login_required
+def growth_log_page():
+    return render_template('growth_log.html', active_page='growth_log')
+
+@app.route('/api/growth-logs', methods=['GET'])
+@login_required
+def api_get_growth_logs():
+    logs = get_growth_logs(limit=50)
+    return jsonify(logs)
+
+@app.route('/api/growth-logs', methods=['POST'])
+@login_required
+def api_post_growth_log():
+    try:
+        data = request.json
+        plant_name = data.get('plant_name')
+        height = data.get('height', 0)
+        health = data.get('health', 'Good')
+        notes = data.get('notes', '')
+        
+        if not plant_name:
+            return jsonify({'success': False, 'message': 'Plant name is required'}), 400
+            
+        insert_growth_log(plant_name, height, health, notes)
+        insert_notification('growth', f'New growth log for {plant_name}: {height}cm, {health}')
+        return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
 
 # --- CLIMATIC DATA ---
 SENSOR_CONFIGS = {

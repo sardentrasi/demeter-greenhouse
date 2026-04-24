@@ -44,6 +44,19 @@ def init_db():
             )
         ''')
 
+        # Create growth logs table
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS growth_logs (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+                plant_name TEXT NOT NULL,
+                height REAL,
+                health TEXT,
+                notes TEXT,
+                img_path TEXT
+            )
+        ''')
+
         # Indexing for performance
         cursor.execute('CREATE INDEX IF NOT EXISTS idx_timestamp ON sensor_logs(timestamp)')
         cursor.execute('CREATE INDEX IF NOT EXISTS idx_notif_read ON notifications(is_read)')
@@ -240,3 +253,37 @@ def mark_notifications_read():
         conn.close()
     except Exception as e:
         logger.error(f"❌ Failed to mark notifications read: {e}")
+
+# ============================================
+# GROWTH LOGS
+# ============================================
+
+def insert_growth_log(plant_name, height, health, notes, img_path=None):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute('''
+            INSERT INTO growth_logs (plant_name, height, health, notes, img_path)
+            VALUES (?, ?, ?, ?, ?)
+        ''', (plant_name, height, health, notes, img_path))
+        conn.commit()
+        conn.close()
+    except Exception as e:
+        logger.error(f"❌ Failed to insert growth log: {e}")
+
+def get_growth_logs(limit=50):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute('''
+            SELECT id, timestamp, plant_name, height, health, notes, img_path
+            FROM growth_logs
+            ORDER BY timestamp DESC
+            LIMIT ?
+        ''', (limit,))
+        rows = cursor.fetchall()
+        conn.close()
+        return [dict(row) for row in rows]
+    except Exception as e:
+        logger.error(f"❌ Failed to fetch growth logs: {e}")
+        return []

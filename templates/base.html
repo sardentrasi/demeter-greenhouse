@@ -73,6 +73,12 @@
                 </div>
             </div>
 
+            <a href="/growth-log" class="flex items-center gap-3 px-4 py-3 rounded-[16px] {{ 'bg-[#9fe870] text-[#163300]' if active_page == 'growth_log' else 'text-white/70 hover:text-white hover:bg-white/5' }} font-bold text-[14px] uppercase tracking-wider transition-colors relative group">
+                {% if active_page == 'growth_log' %}<span class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-[#163300] rounded-r-full"></span>{% endif %}
+                <i data-lucide="sprout" class="w-[18px] h-[18px] shrink-0" stroke-width="2.5"></i>
+                <span class="sidebar-text whitespace-nowrap">Growth Log</span>
+            </a>
+
             <a href="/reports" class="flex items-center gap-3 px-4 py-3 rounded-[16px] {{ 'bg-[#9fe870] text-[#163300]' if active_page == 'reports' else 'text-white/70 hover:text-white hover:bg-white/5' }} font-bold text-[14px] uppercase tracking-wider transition-colors relative group">
                 {% if active_page == 'reports' %}<span class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-[#163300] rounded-r-full"></span>{% endif %}
                 <i data-lucide="file-text" class="w-[18px] h-[18px] shrink-0" stroke-width="2.5"></i>
