@@ -30,28 +30,14 @@ logging.basicConfig(
     level=logging.INFO,
     handlers=[
         logging.FileHandler(os.path.join(os.getcwd(), log_filename), mode='a', encoding='utf-8'),
-        logging.StreamHandler(sys.stdout)
+        logging.StreamHandler(sys.__stdout__)
     ],
     force=True
 )
 logging.getLogger("httpx").setLevel(logging.WARNING)
 logger = logging.getLogger("Demeter")
 
-class StreamToLogger(object):
-    def __init__(self, logger, log_level=logging.INFO):
-        self.logger = logger
-        self.log_level = log_level
-        self.linebuf = ''
 
-    def write(self, buf):
-        for line in buf.rstrip().splitlines():
-            self.logger.log(self.log_level, line.rstrip())
-    def flush(self):
-        pass
-
-# Aktifkan redirect stdout dan stderr ke logging
-sys.stdout = StreamToLogger(logging.getLogger('STDOUT'), logging.INFO)
-sys.stderr = StreamToLogger(logging.getLogger('STDERR'), logging.ERROR)
 
 logging.info(f"--- SYSTEM STARTUP: {current_folder_name.upper()} ---")
 

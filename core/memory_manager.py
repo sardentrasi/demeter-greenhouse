@@ -45,7 +45,7 @@ logging.basicConfig(
     level=logging.INFO,
     handlers=[
         logging.FileHandler(os.path.join(os.getcwd(), "demeter.log"), mode='a', encoding='utf-8'),
-        logging.StreamHandler(sys.stdout)
+        logging.StreamHandler(sys.__stdout__)
     ],
     force=True
 )
