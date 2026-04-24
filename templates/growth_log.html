@@ -4,50 +4,48 @@
 
 {% block head_extra %}
 <style>
-    /* Hide the floating bubble on this page specifically */
-    #chat-fab, #chat-panel { display: none !important; }
-    
     .chat-container {
         display: flex;
         flex-direction: column;
         height: calc(100vh - 180px);
         background: white;
-        border-radius: 30px;
+        border-radius: 24px;
         overflow: hidden;
-        box-shadow: rgba(14,15,12,0.12) 0px 0px 0px 1px;
+        border: 1px solid rgba(0,0,0,0.05);
+        box-shadow: rgba(0,0,0,0.03) 0px 2px 4px;
     }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="mb-6">
-    <h1 class="text-[40px] md:text-[56px] font-display uppercase">Growth Log</h1>
-    <p class="text-[14px] font-bold text-[#868685] uppercase tracking-wider mt-3">Track your plants and consult with AI</p>
+    <h1 class="text-[40px] font-semibold tracking-[-0.8px] text-[#0d0d0d] leading-[1.1]">Growth Log</h1>
+    <p class="text-[16px] text-[#666666] mt-2">Track your plants and consult with AI</p>
 </div>
 
-<div class="grid grid-cols-1 lg:grid-cols-5 gap-8 items-start">
+<div class="grid grid-cols-1 lg:grid-cols-5 gap-6 items-start">
     
     <!-- LEFT: Form and History (3 columns) -->
-    <div class="lg:col-span-3 space-y-8">
+    <div class="lg:col-span-3 space-y-6">
         
         <!-- Log Form -->
-        <div class="wise-card">
-            <h2 class="text-[24px] font-display uppercase mb-6 flex items-center gap-3">
-                <i data-lucide="plus-circle" class="text-[#9fe870]"></i> New Entry
+        <div class="mint-card-featured">
+            <h2 class="text-[20px] font-semibold tracking-[-0.2px] text-[#0d0d0d] mb-6 flex items-center gap-3">
+                <i data-lucide="plus-circle" class="w-5 h-5 text-[#18E299]"></i> New Entry
             </h2>
             <form id="growth-form" class="space-y-4">
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-[11px] font-bold uppercase tracking-widest text-[#454745] mb-2">Plant Name</label>
+                        <label class="block text-[13px] font-medium text-[#666666] mb-2 tracking-[0.65px] uppercase">Plant Name</label>
                         <input type="text" id="plant-name" class="form-control" placeholder="e.g. Tomato A1" required>
                     </div>
                     <div>
-                        <label class="block text-[11px] font-bold uppercase tracking-widest text-[#454745] mb-2">Height (cm)</label>
+                        <label class="block text-[13px] font-medium text-[#666666] mb-2 tracking-[0.65px] uppercase">Height (cm)</label>
                         <input type="number" id="plant-height" class="form-control" placeholder="15.5" step="0.1">
                     </div>
                 </div>
                 <div>
-                    <label class="block text-[11px] font-bold uppercase tracking-widest text-[#454745] mb-2">Health Status</label>
+                    <label class="block text-[13px] font-medium text-[#666666] mb-2 tracking-[0.65px] uppercase">Health Status</label>
                     <select id="plant-health" class="form-control">
                         <option value="Excellent">Excellent - Vibrant & Strong</option>
                         <option value="Good" selected>Good - Steady Growth</option>
@@ -56,28 +54,27 @@
                     </select>
                 </div>
                 <div>
-                    <label class="block text-[11px] font-bold uppercase tracking-widest text-[#454745] mb-2">Observation Notes</label>
+                    <label class="block text-[13px] font-medium text-[#666666] mb-2 tracking-[0.65px] uppercase">Observation Notes</label>
                     <textarea id="plant-notes" class="form-control min-h-[100px]" placeholder="Add your observations here..."></textarea>
                 </div>
-                <button type="submit" class="btn-wise w-full !py-3.5 !text-[14px] uppercase tracking-wider">
+                <button type="submit" class="btn-primary w-full !py-3 !text-[15px]">
                     Save Growth Log
                 </button>
             </form>
         </div>
 
         <!-- History -->
-        <div class="wise-card">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4 border-b border-[#e8ebe6] pb-4">
-                <h2 class="text-[24px] font-display uppercase flex items-center gap-3">
-                    <i data-lucide="history" class="text-[#163300]"></i> Timeline
+        <div class="mint-card-featured">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4 pb-4 border-b border-black/[0.05]">
+                <h2 class="text-[20px] font-semibold tracking-[-0.2px] text-[#0d0d0d] flex items-center gap-3">
+                    <i data-lucide="history" class="w-5 h-5 text-[#666666]"></i> Timeline
                 </h2>
-                <button id="btn-manual-scan" class="btn-wise px-5 py-2.5 !text-[12px]">
+                <button id="btn-manual-scan" class="btn-brand px-5 py-2 !text-[13px]">
                     <i data-lucide="scan" class="w-4 h-4"></i> Manual Analysis
                 </button>
             </div>
-            <div id="growth-list" class="space-y-6">
-                <!-- Data will be loaded here -->
-                <p class="text-center py-12 text-[14px] font-semibold text-[#868685] uppercase tracking-wider">Loading history...</p>
+            <div id="growth-list" class="space-y-4">
+                <p class="text-center py-12 text-[14px] font-medium text-[#888888]">Loading history...</p>
             </div>
         </div>
     </div>
@@ -85,32 +82,32 @@
     <!-- RIGHT: AI Consultant (2 columns) -->
     <div class="lg:col-span-2 lg:sticky lg:top-8">
         <div class="chat-container">
-            <div class="bg-[#163300] text-white p-5 border-b border-white/10 flex items-center gap-4">
-                <div class="w-10 h-10 rounded-full bg-[#9fe870] text-[#163300] flex items-center justify-center">
-                    <i data-lucide="bot" class="w-6 h-6" stroke-width="2.5"></i>
+            <div class="bg-[#0d0d0d] text-white p-5 flex items-center gap-4">
+                <div class="w-10 h-10 rounded-full bg-[#18E299] text-[#0d0d0d] flex items-center justify-center">
+                    <i data-lucide="bot" class="w-5 h-5" stroke-width="2.5"></i>
                 </div>
                 <div>
-                    <p class="font-bold text-[16px] uppercase tracking-tight">AI Agronomist</p>
-                    <p class="text-[10px] font-bold uppercase tracking-widest text-[#9fe870]/80">Growth Specialist Mode</p>
+                    <p class="font-semibold text-[15px]">AI Agronomist</p>
+                    <p class="font-mono text-[10px] text-white/40">GROWTH SPECIALIST</p>
                 </div>
             </div>
             
-            <div id="page-chat-messages" class="flex-1 overflow-y-auto p-6 space-y-6 custom-scroll">
+            <div id="page-chat-messages" class="flex-1 overflow-y-auto p-6 space-y-5 custom-scroll">
                 <div class="flex gap-3">
-                    <div class="w-8 h-8 rounded-full bg-[#e2f6d5] text-[#163300] flex items-center justify-center shrink-0">
+                    <div class="w-8 h-8 rounded-full bg-[#d4fae8] text-[#0fa76e] flex items-center justify-center shrink-0">
                         <i data-lucide="bot" class="w-4 h-4" stroke-width="2.5"></i>
                     </div>
-                    <div class="bg-[#e8ebe6] rounded-[20px] rounded-tl-[4px] px-4 py-3 max-w-[85%] shadow-sm">
-                        <p class="text-[14px] font-semibold leading-relaxed">I've reviewed your plant logs. How can I help you optimize your greenhouse today?</p>
+                    <div class="bg-[#f5f5f5] rounded-[16px] rounded-tl-[4px] px-4 py-3 max-w-[85%]">
+                        <p class="text-[14px] leading-relaxed text-[#333333]">I've reviewed your plant logs. How can I help you optimize your greenhouse today?</p>
                     </div>
                 </div>
             </div>
 
-            <div class="p-6 border-t border-[#e8ebe6] bg-[#f9faf8]">
+            <div class="p-5 border-t border-black/[0.05] bg-[#fafafa]">
                 <form id="page-chat-form" class="flex gap-3">
-                    <input type="text" id="page-chat-input" placeholder="Consult about your growth logs..." class="form-control flex-1 !rounded-full !py-4 !px-6 !text-[14px] shadow-sm" autocomplete="off">
-                    <button type="submit" class="w-14 h-14 rounded-full bg-[#9fe870] text-[#163300] flex items-center justify-center shrink-0 hover:rotate-12 transition-transform shadow-md">
-                        <i data-lucide="send" class="w-6 h-6" stroke-width="2.5"></i>
+                    <input type="text" id="page-chat-input" placeholder="Consult about your growth logs..." class="form-control flex-1 !py-3 !px-5 !text-[14px]" autocomplete="off">
+                    <button type="submit" class="btn-brand w-12 h-12 !p-0 shrink-0">
+                        <i data-lucide="send" class="w-5 h-5" stroke-width="2"></i>
                     </button>
                 </form>
             </div>
@@ -136,27 +133,27 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await res.json();
             
             if (data.length === 0) {
-                growthList.innerHTML = '<p class="text-center py-12 text-[14px] font-bold text-[#868685] uppercase tracking-wider">No logs yet. Start by adding one!</p>';
+                growthList.innerHTML = '<p class="text-center py-12 text-[14px] font-medium text-[#888888]">No logs yet. Start by adding one!</p>';
                 return;
             }
 
             growthList.innerHTML = '';
             data.forEach(log => {
                 const card = document.createElement('div');
-                card.className = 'p-5 rounded-[20px] bg-[#e8ebe6]/50 border border-white flex flex-col gap-3 hover:bg-white transition-colors cursor-default';
+                card.className = 'mint-card flex flex-col gap-3 !p-5';
                 card.innerHTML = `
                     <div class="flex justify-between items-start">
                         <div>
-                            <span class="text-[10px] font-bold uppercase tracking-widest text-[#868685]">${log.timestamp}</span>
-                            <h3 class="text-[18px] font-display uppercase mt-1">${log.plant_name}</h3>
+                            <span class="font-mono text-[10px] text-[#888888]">${log.timestamp}</span>
+                            <h3 class="text-[16px] font-semibold text-[#0d0d0d] mt-1">${log.plant_name}</h3>
                         </div>
-                        <span class="px-3 py-1 rounded-full bg-white border border-[#e8ebe6] text-[11px] font-black uppercase tracking-wider ${getHealthColor(log.health)}">${log.health}</span>
+                        <span class="${getHealthBadge(log.health)} font-mono text-[10px]">${log.health}</span>
                     </div>
                     <div class="flex items-center gap-2">
-                        <i data-lucide="ruler" class="w-4 h-4 text-[#868685]"></i>
-                        <span class="text-[14px] font-bold">${log.height} cm</span>
+                        <i data-lucide="ruler" class="w-4 h-4 text-[#888888]"></i>
+                        <span class="text-[14px] font-medium text-[#0d0d0d]">${log.height} cm</span>
                     </div>
-                    <p class="text-[13px] font-medium text-[#454745] leading-relaxed">${log.notes || 'No notes added.'}</p>
+                    <p class="text-[13px] text-[#666666] leading-relaxed">${log.notes || 'No notes added.'}</p>
                 `;
                 growthList.appendChild(card);
             });
@@ -164,11 +161,11 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (e) { console.error(e); }
     }
 
-    function getHealthColor(status) {
-        if (status === 'Excellent') return 'text-[#054d28]';
-        if (status === 'Good') return 'text-[#163300]';
-        if (status === 'Fair') return 'text-[#d48c00]';
-        return 'text-[#d03238]';
+    function getHealthBadge(status) {
+        if (status === 'Excellent') return 'badge-green';
+        if (status === 'Good') return 'badge-green';
+        if (status === 'Fair') return 'badge-amber';
+        return 'badge-red';
     }
 
     // Submit Form
@@ -195,7 +192,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (res.ok) {
                 growthForm.reset();
                 fetchHistory();
-                // Send automatically to chat for consultation
                 sendToAIConsultant(`I just added a new growth log for ${payload.plant_name}. Height is ${payload.height}cm and status is ${payload.health}. Notes: ${payload.notes}. Any advice?`);
             }
         } catch (e) { alert('Failed to save log'); }
@@ -220,7 +216,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 const res = await fetch('/api/controls/scan', { method: 'POST' });
                 const data = await res.json();
                 alert(data.message);
-                // Refresh list after a delay to wait for ESP32 cycle
                 setTimeout(fetchHistory, 35000); 
             } catch(e) { alert('Failed to trigger scan'); }
         });
@@ -252,11 +247,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const div = document.createElement('div');
         div.className = isUser ? 'flex justify-end' : 'flex gap-3';
         if (isUser) {
-            div.innerHTML = `<div class="bg-[#9fe870] text-[#163300] rounded-[20px] rounded-tr-[4px] px-5 py-4 max-w-[85%] shadow-sm"><p class="text-[14px] font-bold">${text}</p></div>`;
+            div.innerHTML = `<div class="bg-[#0d0d0d] text-white rounded-[16px] rounded-tr-[4px] px-4 py-3 max-w-[85%]"><p class="text-[14px]">${text}</p></div>`;
         } else {
             div.innerHTML = `
-                <div class="w-8 h-8 rounded-full bg-[#e2f6d5] text-[#163300] flex items-center justify-center shrink-0"><i data-lucide="bot" class="w-4 h-4"></i></div>
-                <div class="bg-[#e8ebe6] rounded-[20px] rounded-tl-[4px] px-5 py-4 max-w-[85%] shadow-sm"><p class="text-[14px] font-semibold leading-relaxed">${text}</p></div>
+                <div class="w-8 h-8 rounded-full bg-[#d4fae8] text-[#0fa76e] flex items-center justify-center shrink-0"><i data-lucide="bot" class="w-4 h-4"></i></div>
+                <div class="bg-[#f5f5f5] rounded-[16px] rounded-tl-[4px] px-4 py-3 max-w-[85%]"><p class="text-[14px] leading-relaxed text-[#333333]">${text}</p></div>
             `;
         }
         chatMessages.appendChild(div);
@@ -268,8 +263,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const div = document.createElement('div');
         div.id = id; div.className = 'flex gap-3';
         div.innerHTML = `
-            <div class="w-8 h-8 rounded-full bg-[#e2f6d5] text-[#163300] flex items-center justify-center shrink-0 animate-pulse"><i data-lucide="bot" class="w-4 h-4"></i></div>
-            <div class="bg-[#e8ebe6] rounded-[20px] rounded-tl-[4px] px-5 py-4"><p class="text-[10px] font-black uppercase tracking-widest text-[#868685]">Analyzing Logs...</p></div>
+            <div class="w-8 h-8 rounded-full bg-[#d4fae8] text-[#0fa76e] flex items-center justify-center shrink-0 animate-pulse"><i data-lucide="bot" class="w-4 h-4"></i></div>
+            <div class="bg-[#f5f5f5] rounded-[16px] rounded-tl-[4px] px-4 py-3"><p class="font-mono text-[10px] text-[#888888]">ANALYZING...</p></div>
         `;
         chatMessages.appendChild(div);
         chatMessages.scrollTop = chatMessages.scrollHeight;

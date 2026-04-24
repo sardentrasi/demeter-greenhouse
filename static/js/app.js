@@ -241,15 +241,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Sensor Connection Logic (within 60s is Online)
                 const diffSec = (new Date() - dt) / 1000;
                 if (diffSec < 65) {
-                    systemBadge.textContent = "Sensor Online";
-                    systemBadge.parentElement.className = "flex items-center gap-2 px-3 py-1.5 bg-[#cdffad]/50 rounded-full shadow-[0_0_0_1px_rgba(14,15,12,0.05)] border border-[#9fe870]";
+                    systemBadge.textContent = "SENSOR ONLINE";
+                    systemBadge.parentElement.className = "flex items-center gap-2 px-3 py-1.5 bg-[#d4fae8] rounded-full border border-[#18E299]/30";
                     systemBadge.previousElementSibling.setAttribute('data-lucide', 'check-circle-2');
-                    systemBadge.previousElementSibling.className = "w-4 h-4 text-[#054d28]";
+                    systemBadge.previousElementSibling.className = "w-4 h-4 text-[#0fa76e]";
                 } else {
-                    systemBadge.textContent = "Sensor Offline";
-                    systemBadge.parentElement.className = "flex items-center gap-2 px-3 py-1.5 bg-[#ffdada]/50 rounded-full shadow-[0_0_0_1px_rgba(14,15,12,0.05)] border border-[#d03238]";
+                    systemBadge.textContent = "SENSOR OFFLINE";
+                    systemBadge.parentElement.className = "flex items-center gap-2 px-3 py-1.5 bg-[#fde8e8] rounded-full border border-[#d45656]/30";
                     systemBadge.previousElementSibling.setAttribute('data-lucide', 'alert-circle');
-                    systemBadge.previousElementSibling.className = "w-4 h-4 text-[#d03238]";
+                    systemBadge.previousElementSibling.className = "w-4 h-4 text-[#d45656]";
                 }
                 if (typeof lucide !== 'undefined') lucide.createIcons();
             }
