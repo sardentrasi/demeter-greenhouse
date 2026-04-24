@@ -140,10 +140,10 @@ h2 {
     padding: 32px 32px 48px;
 }
 
-/* Dashboard Top Grid: 3 sensor cards */
+/* Dashboard Top Grid: 4 sensor cards */
 .dashboard-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 24px;
     margin-bottom: 24px;
 }
@@ -159,7 +159,7 @@ h2 {
 /* Breakpoints */
 @media (max-width: 992px) {
     .dashboard-grid {
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: repeat(2, 1fr);
     }
     .content-grid {
         grid-template-columns: 1fr;
