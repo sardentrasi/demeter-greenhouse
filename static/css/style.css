@@ -13,21 +13,21 @@ body {
     font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
     font-weight: 600;
     font-feature-settings: "calt" 1;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    background-color: var(--warm-white);
+    color: var(--near-black);
 }
 
-/* Font Display — Arial Black as fallback for Wise Sans */
 .font-display {
-    font-family: 'Arial Black', 'Inter', ui-sans-serif, system-ui, sans-serif;
+    font-family: 'Inter', sans-serif; /* Fallback for Wise Sans */
     font-weight: 900;
-    letter-spacing: -0.04em;
     line-height: 0.85;
 }
 
 /* Sidebar Submenu */
 #sidebar {
-    background-color: #131611;
+    background-color: var(--near-black);
     transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s ease-in-out;
     position: fixed;
     height: 100vh;
@@ -169,23 +169,50 @@ body {
 .custom-scroll::-webkit-scrollbar-thumb { background: #e8ebe6; border-radius: 9999px; }
 .custom-scroll::-webkit-scrollbar-thumb:hover { background: #868685; }
 
-/* Login overrides */
-.form-control {
-    width: 100%;
-    padding: 14px 16px;
-    border: 2px solid #e8ebe6;
-    border-radius: 16px;
-    font-family: 'Inter', sans-serif;
-    font-size: 16px;
-    font-weight: 600;
-    background: #e8ebe6;
-    color: #0e0f0c;
-    transition: border-color 0.2s, background-color 0.2s;
-    box-sizing: border-box;
-    font-feature-settings: "calt" 1;
+/* Button Base */
+.btn-wise {
+    background-color: var(--wise-green);
+    color: var(--dark-green);
+    border-radius: 9999px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: none;
+    cursor: pointer;
 }
 
-.form-control:focus {
+.btn-wise:hover {
+    transform: scale(1.05);
+}
+
+.btn-wise:active {
+    transform: scale(0.95);
+}
+
+/* Card System */
+.wise-card {
+    background: white;
+    border-radius: 30px;
+    box-shadow: var(--ring-shadow);
+    padding: 32px;
+}
+
+/* Form Controls */
+.form-control {
+    width: 100%;
+    background-color: var(--warm-white);
+    border: 1px solid rgba(14,15,12,0.08);
+    border-radius: 16px;
+    padding: 12px 16px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    color: var(--near-black);
+    transition: border-color 0.2s;
     outline: none;
     border-color: #9fe870;
     background: #ffffff;

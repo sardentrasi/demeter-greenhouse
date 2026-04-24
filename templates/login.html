@@ -8,41 +8,47 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@600;900&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body class="bg-[#e8ebe6] text-[#0e0f0c] flex items-center justify-center min-h-screen p-6">
 
-    <div class="bg-white rounded-[30px] shadow-[0_0_0_1px_rgba(14,15,12,0.12)] w-full max-w-[420px] p-12 text-center">
+    <div class="wise-card w-full max-w-[460px] p-10 md:p-14 text-center">
 
         <!-- Brand -->
-        <div class="flex items-center justify-center gap-2 mb-2">
-            <div class="w-10 h-10 rounded-full bg-[#163300] text-[#9fe870] flex items-center justify-center border border-[#9fe870]/30 shadow-[0_0_10px_rgba(159,232,112,0.2)] text-lg">🌱</div>
-        </div>
-        <h1 class="font-display text-[48px] uppercase mt-4">DEMETER</h1>
-        <p class="text-[#868685] text-[15px] font-semibold mb-10">Restricted Access: Precision Biosphere</p>
-
-        {% if error %}
-        <div class="bg-[#d03238] text-white py-3 px-4 rounded-[16px] font-semibold text-[14px] text-left mb-6">
-            ⚠️ {{ error }}
-        </div>
-        {% endif %}
-
-        <form action="{{ url_for('login') }}" method="POST" class="text-left">
-            <div class="mb-5">
-                <label for="username" class="block text-[11px] font-bold uppercase tracking-widest text-[#454745] mb-2">Operator ID</label>
-                <input type="text" id="username" name="username" class="form-control" placeholder="admin" required autofocus>
+        <div class="flex items-center justify-center gap-3 mb-12">
+            <div class="w-12 h-12 rounded-full bg-[#163300] text-[#9fe870] flex items-center justify-center border border-[#9fe870]/30 shadow-[0_0_15px_rgba(159,232,112,0.3)]">
+                <i data-lucide="droplets" class="w-6 h-6" stroke-width="3"></i>
             </div>
-            <div class="mb-6">
-                <label for="password" class="block text-[11px] font-bold uppercase tracking-widest text-[#454745] mb-2">Security Protocol</label>
-                <input type="password" id="password" name="password" class="form-control" placeholder="" required>
+            <span class="text-[28px] font-display uppercase tracking-tight">Demeter<span class="text-[#9fe870]">.</span></span>
+        </div>
+
+        <h1 class="text-[56px] md:text-[72px] font-display uppercase leading-[0.85] mb-4">Garden<br>Access</h1>
+        <p class="text-[14px] font-bold text-[#868685] uppercase tracking-widest mb-10">Secure Biosphere Management</p>
+
+        <form action="/login" method="POST" class="space-y-6 text-left">
+            <div>
+                <label class="block text-[11px] font-bold uppercase tracking-widest text-[#454745] mb-2 px-1">Operator Key</label>
+                <input type="password" name="password" class="form-control !py-4 !text-center !text-[18px]" placeholder="••••••••" required autofocus>
             </div>
-            <button type="submit" id="btn-login" class="w-full py-3.5 rounded-full bg-[#9fe870] text-[#163300] font-bold text-[14px] uppercase tracking-wider hover:scale-105 active:scale-95 transition-transform cursor-pointer border-none">
-                Login to System
+
+            {% if error %}
+            <div class="bg-[#d03238]/10 text-[#d03238] p-4 rounded-[16px] text-[12px] font-bold uppercase tracking-wider flex items-center gap-2">
+                <i data-lucide="alert-circle" class="w-4 h-4"></i>
+                {{ error }}
+            </div>
+            {% endif %}
+
+            <button type="submit" class="btn-wise w-full py-5 text-[16px]">
+                Open Command Center
             </button>
         </form>
 
-        <p class="text-[10px] font-bold uppercase tracking-widest text-[#868685] mt-8">Demeter v6.2 — Greenhouse Monitor</p>
+        <div class="mt-12 pt-8 border-t border-[#e8ebe6]">
+            <p class="text-[10px] font-black uppercase tracking-[0.2em] text-[#868685]">Demeter AI Agronomist v6.2</p>
+        </div>
     </div>
 
+    <script>lucide.createIcons();</script>
 </body>
 </html>
