@@ -27,29 +27,66 @@ body {
 
 /* Sidebar Submenu */
 #sidebar {
-    background-color: #131611; /* Softer Deep Moss Charcoal */
-    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    background-color: #131611;
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s ease-in-out;
+    position: fixed;
+    height: 100vh;
+    left: 0;
+    top: 0;
 }
 
-#sidebar.minimized {
-    width: 84px;
+/* Desktop Styles */
+@media (min-width: 768px) {
+    #sidebar {
+        position: relative;
+    }
+    
+    #sidebar.minimized {
+        width: 84px;
+    }
+    
+    #sidebar.minimized .sidebar-text,
+    #sidebar.minimized .sidebar-tag,
+    #sidebar.minimized .user-info {
+        display: none;
+    }
+    
+    #sidebar.minimized nav {
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+    
+    #sidebar.minimized a, #sidebar.minimized button {
+        justify-content: center;
+        padding-left: 0;
+        padding-right: 0;
+    }
 }
 
-#sidebar.minimized .sidebar-text,
-#sidebar.minimized .sidebar-tag,
-#sidebar.minimized .user-info {
+/* Mobile Styles */
+@media (max-width: 767px) {
+    #sidebar {
+        transform: translateX(-100%);
+        width: 280px;
+    }
+    
+    #sidebar.mobile-open {
+        transform: translateX(0);
+        box-shadow: 20px 0 50px rgba(0,0,0,0.5);
+    }
+}
+
+#sidebar-backdrop {
     display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(14, 15, 12, 0.4);
+    backdrop-filter: blur(4px);
+    z-index: 15;
 }
 
-#sidebar.minimized nav {
-    padding-left: 12px;
-    padding-right: 12px;
-}
-
-#sidebar.minimized a, #sidebar.minimized button {
-    justify-content: center;
-    padding-left: 0;
-    padding-right: 0;
+#sidebar-backdrop.show {
+    display: block;
 }
 
 #sidebar.minimized .sidebar-brand-text {

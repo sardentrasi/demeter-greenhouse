@@ -18,7 +18,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // DOM Elements - Sidebar
     const sidebar = document.getElementById('sidebar');
     const sidebarToggle = document.getElementById('btn-sidebar-toggle');
-    const sidebarToggleIcon = document.getElementById('sidebar-toggle-icon');
+    const mobileToggle = document.getElementById('btn-mobile-toggle');
+    const backdrop = document.getElementById('sidebar-backdrop');
     
     // DOM Elements - Sidebar Submenu
     const climaticToggle = document.getElementById('btn-climatic-toggle');
@@ -112,27 +113,41 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ===== SIDEBAR LOGIC =====
     if (sidebarToggle) {
-        // Load preference
+        // Desktop: Minimize toggle
         const isMinimized = localStorage.getItem('sidebar-minimized') === 'true';
-        if (isMinimized) {
+        if (isMinimized && window.innerWidth >= 768) {
             sidebar.classList.add('minimized');
-            sidebarToggleIcon.setAttribute('data-lucide', 'chevron-right');
-            if (typeof lucide !== 'undefined') lucide.createIcons();
         }
 
         sidebarToggle.addEventListener('click', () => {
-            sidebar.classList.toggle('minimized');
-            const nowMinimized = sidebar.classList.contains('minimized');
-            localStorage.setItem('sidebar-minimized', nowMinimized);
-            
-            sidebarToggleIcon.setAttribute('data-lucide', nowMinimized ? 'chevron-right' : 'chevron-left');
-            if (typeof lucide !== 'undefined') lucide.createIcons();
-            
-            // Close submenus if minimizing
-            if (nowMinimized) {
-                climaticSubmenu.classList.remove('show');
-                climaticChevron.style.transform = 'rotate(0deg)';
+            if (window.innerWidth >= 768) {
+                // Desktop minimize
+                sidebar.classList.toggle('minimized');
+                localStorage.setItem('sidebar-minimized', sidebar.classList.contains('minimized'));
+                
+                if (sidebar.classList.contains('minimized')) {
+                    climaticSubmenu.classList.remove('show');
+                    climaticChevron.style.transform = 'rotate(0deg)';
+                }
+            } else {
+                // Mobile: Close drawer
+                sidebar.classList.remove('mobile-open');
+                backdrop.classList.remove('show');
             }
+        });
+    }
+
+    if (mobileToggle) {
+        mobileToggle.addEventListener('click', () => {
+            sidebar.classList.add('mobile-open');
+            backdrop.classList.add('show');
+        });
+    }
+
+    if (backdrop) {
+        backdrop.addEventListener('click', () => {
+            sidebar.classList.remove('mobile-open');
+            backdrop.classList.remove('show');
         });
     }
 

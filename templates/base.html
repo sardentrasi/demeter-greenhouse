@@ -15,10 +15,12 @@
 </head>
 <body class="bg-[#e8ebe6] text-[#0e0f0c]">
 
+<div id="sidebar-backdrop"></div>
+
 <div class="flex h-screen overflow-hidden">
 
     <!-- ==================== SIDEBAR ==================== -->
-    <aside id="sidebar" class="w-[260px] shrink-0 flex-col text-white z-20 hidden md:flex relative">
+    <aside id="sidebar" class="w-[260px] shrink-0 flex-col text-white z-20 flex relative">
 
         <!-- Brand -->
         <div class="h-[72px] flex items-center justify-between px-6 border-b border-white/10 shrink-0">
@@ -29,7 +31,7 @@
                 <span class="sidebar-brand-text">DEMETER<span class="text-[#9fe870]">.</span></span>
             </a>
             <button id="btn-sidebar-toggle" class="p-1.5 hover:bg-white/10 rounded-lg transition-colors cursor-pointer bg-transparent border-none text-white/50 hover:text-white">
-                <i data-lucide="chevron-left" class="w-5 h-5" id="sidebar-toggle-icon"></i>
+                <i data-lucide="menu" class="w-5 h-5"></i>
             </button>
         </div>
 
@@ -105,7 +107,7 @@
         <!-- TOP HEADER -->
         <header class="h-[72px] bg-white border-b shadow-[0_0_0_1px_rgba(14,15,12,0.05)] border-transparent shrink-0 flex justify-between items-center px-6 z-10">
             <div class="flex items-center gap-4">
-                <button class="md:hidden p-2 text-[#0e0f0c] hover:bg-black/5 rounded-full transition-colors">
+                <button id="btn-mobile-toggle" class="md:hidden p-2 text-[#0e0f0c] hover:bg-black/5 rounded-full transition-colors cursor-pointer border-none bg-transparent">
                     <i data-lucide="menu" class="w-6 h-6"></i>
                 </button>
                 <div class="hidden md:flex items-center gap-2">
