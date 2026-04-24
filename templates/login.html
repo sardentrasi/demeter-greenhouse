@@ -6,31 +6,43 @@
     <title>Demeter — Login</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@600;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
-<body class="login-wrapper">
-    <div class="card login-card">
-        <h1>DEMETER</h1>
-        <p class="login-subtitle">Restricted Access: Precision Biosphere</p>
+<body class="bg-[#e8ebe6] text-[#0e0f0c] flex items-center justify-center min-h-screen p-6">
+
+    <div class="bg-white rounded-[30px] shadow-[0_0_0_1px_rgba(14,15,12,0.12)] w-full max-w-[420px] p-12 text-center">
+
+        <!-- Brand -->
+        <div class="flex items-center justify-center gap-2 mb-2">
+            <div class="w-10 h-10 rounded-full bg-[#163300] text-[#9fe870] flex items-center justify-center border border-[#9fe870]/30 shadow-[0_0_10px_rgba(159,232,112,0.2)] text-lg">🌱</div>
+        </div>
+        <h1 class="font-display text-[48px] uppercase mt-4">DEMETER</h1>
+        <p class="text-[#868685] text-[15px] font-semibold mb-10">Restricted Access: Precision Biosphere</p>
 
         {% if error %}
-        <div class="error-message">
+        <div class="bg-[#d03238] text-white py-3 px-4 rounded-[16px] font-semibold text-[14px] text-left mb-6">
             ⚠️ {{ error }}
         </div>
         {% endif %}
 
-        <form action="{{ url_for('login') }}" method="POST">
-            <div class="form-group">
-                <label for="username">Operator ID</label>
+        <form action="{{ url_for('login') }}" method="POST" class="text-left">
+            <div class="mb-5">
+                <label for="username" class="block text-[11px] font-bold uppercase tracking-widest text-[#454745] mb-2">Operator ID</label>
                 <input type="text" id="username" name="username" class="form-control" placeholder="admin" required autofocus>
             </div>
-            <div class="form-group">
-                <label for="password">Security Protocol</label>
+            <div class="mb-6">
+                <label for="password" class="block text-[11px] font-bold uppercase tracking-widest text-[#454745] mb-2">Security Protocol</label>
                 <input type="password" id="password" name="password" class="form-control" placeholder="" required>
             </div>
-            <button type="submit" class="btn-primary btn-block" id="btn-login">Login to System</button>
+            <button type="submit" id="btn-login" class="w-full py-3.5 rounded-full bg-[#9fe870] text-[#163300] font-bold text-[14px] uppercase tracking-wider hover:scale-105 active:scale-95 transition-transform cursor-pointer border-none">
+                Login to System
+            </button>
         </form>
+
+        <p class="text-[10px] font-bold uppercase tracking-widest text-[#868685] mt-8">Demeter v6.2 — Greenhouse Monitor</p>
     </div>
+
 </body>
 </html>

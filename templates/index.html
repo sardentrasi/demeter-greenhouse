@@ -7,123 +7,300 @@
     <meta name="description" content="Demeter AI Agronomist — Precision Biosphere Management System">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@600;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
     <link rel="stylesheet" href="/static/css/style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body>
+<body class="bg-[#e8ebe6] text-[#0e0f0c]">
 
-    <!-- Header -->
-    <header class="header">
-        <div class="header-content">
-            <div class="header-brand">
-                <h1>DEMETER</h1>
-                <p>Precision Biosphere Management</p>
-            </div>
-            <a href="/logout" class="btn-secondary" id="btn-logout">Logout</a>
-        </div>
-    </header>
+<div class="flex h-screen overflow-hidden">
 
-    <main class="container">
+    <!-- ==================== SIDEBAR ==================== -->
+    <aside class="w-[260px] bg-[#0e0f0c] shrink-0 flex-col text-white z-20 hidden md:flex">
 
-        <!-- Sensor Cards Row -->
-        <div class="dashboard-grid">
-
-            <!-- Soil Moisture -->
-            <div class="card card-sensor">
-                <p class="card-title">Soil Moisture</p>
-                <div class="sensor-value">
-                    <span id="moisture-val">--</span><span class="unit">%</span>
+        <!-- Brand -->
+        <div class="h-[72px] flex items-center px-6 border-b border-white/10 shrink-0">
+            <div class="font-display text-[26px] flex items-center gap-2">
+                <div class="w-8 h-8 rounded-full bg-[#163300] text-[#9fe870] flex items-center justify-center border border-[#9fe870]/30 shadow-[0_0_10px_rgba(159,232,112,0.2)]">
+                    <i data-lucide="droplets" class="w-[18px] h-[18px]" stroke-width="3"></i>
                 </div>
-                <p class="sensor-label">Capacitive Sensor</p>
+                DEMETER<span class="text-[#9fe870]">.</span>
             </div>
-
-            <!-- Air Condition -->
-            <div class="card card-sensor">
-                <p class="card-title">Air Condition</p>
-                <div class="air-metrics">
-                    <div class="air-metric">
-                        <div class="sensor-value">
-                            <span id="temp-val">--</span><span class="unit">°C</span>
-                        </div>
-                        <p class="sensor-label">Temperature</p>
-                    </div>
-                    <div class="air-metric">
-                        <div class="sensor-value">
-                            <span id="humidity-val">--</span><span class="unit">%</span>
-                        </div>
-                        <p class="sensor-label">Humidity</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- CO₂ Monitor -->
-            <div class="card card-sensor">
-                <p class="card-title">CO₂ Monitor</p>
-                <div class="sensor-value">
-                    <span id="co2-val">--</span><span class="unit">ppm</span>
-                </div>
-                <p class="sensor-label">MQ-135 Sensor</p>
-            </div>
-
-            <!-- AI Status -->
-            <div class="card status-card">
-                <div>
-                    <p class="card-title">AI Status</p>
-                    <div class="ai-status">
-                        <span id="action-badge" class="badge waiting">WAITING</span>
-                    </div>
-                    <p id="status-desc" class="status-desc">Waiting for system update...</p>
-                </div>
-                <div class="last-seen">
-                    Last Sync: <span id="last-seen-time">--:--:--</span>
-                </div>
-            </div>
-
         </div>
 
-        <!-- Visual Analysis & History -->
-        <div class="content-grid">
+        <!-- User Card -->
+        <div class="p-6 bg-[#163300]/40 border-b border-white/5 flex items-center gap-4">
+            <div class="w-12 h-12 rounded-full bg-[#9fe870] text-[#163300] flex items-center justify-center shrink-0 border-2 border-[#163300]">
+                <i data-lucide="user" class="w-6 h-6" stroke-width="2.5"></i>
+            </div>
+            <div>
+                <p class="text-[10px] uppercase font-bold tracking-widest text-[#868685]">Welcome,</p>
+                <p class="font-bold text-[14px]">System Admin</p>
+            </div>
+        </div>
 
-            <!-- Visual Analysis -->
-            <div class="card visual-card">
-                <p class="card-title">Latest Visual Analysis</p>
-                <div class="image-container">
-                    <img id="latest-capture" src="" alt="Waiting for camera capture..." />
-                    <div id="no-image" class="no-image-placeholder">No image available yet</div>
-                </div>
-                <div class="actions">
-                    <button class="btn-primary" id="btn-force-scan" onclick="forceAnalyze()">Force Visual Scan</button>
-                    <button class="btn-secondary" id="btn-force-water" onclick="forceWater()">Force Water</button>
+        <!-- Navigation -->
+        <nav class="flex-1 overflow-y-auto py-6 px-4 space-y-1">
+            <div class="text-[10px] uppercase font-bold tracking-widest text-[#868685] mb-4 px-2">Navigation</div>
+
+            <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-[16px] bg-[#9fe870] text-[#163300] font-bold text-[14px] uppercase tracking-wider relative">
+                <span class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-[#163300] rounded-r-full"></span>
+                <i data-lucide="home" class="w-[18px] h-[18px]" stroke-width="2.5"></i>
+                Dashboard
+            </a>
+
+            <!-- Climatic Data with submenu -->
+            <div>
+                <a href="#" class="flex items-center justify-between px-4 py-3 rounded-[16px] text-white/70 hover:text-white hover:bg-white/5 font-bold text-[14px] uppercase tracking-wider transition-colors">
+                    <div class="flex items-center gap-3">
+                        <i data-lucide="bar-chart-2" class="w-[18px] h-[18px]" stroke-width="2.5"></i>
+                        Climatic Data
+                    </div>
+                    <i data-lucide="chevron-down" class="w-4 h-4"></i>
+                </a>
+                <div class="pl-[42px] pr-4 py-2 flex flex-col gap-3 relative before:absolute before:left-[22px] before:top-0 before:bottom-4 before:w-px before:bg-white/10">
+                    <a href="#" class="text-[12px] font-semibold text-white/50 hover:text-[#9fe870] uppercase tracking-wider relative before:absolute before:-left-[20px] before:top-1/2 before:w-3 before:h-px before:bg-white/10">Temperature</a>
+                    <a href="#" class="text-[12px] font-semibold text-[#9fe870] uppercase tracking-wider relative before:absolute before:-left-[20px] before:top-1/2 before:w-3 before:h-px before:bg-[#9fe870]">Humidity</a>
+                    <a href="#" class="text-[12px] font-semibold text-white/50 hover:text-[#9fe870] uppercase tracking-wider relative before:absolute before:-left-[20px] before:top-1/2 before:w-3 before:h-px before:bg-white/10">Soil Moisture</a>
+                    <a href="#" class="text-[12px] font-semibold text-white/50 hover:text-[#9fe870] uppercase tracking-wider relative before:absolute before:-left-[20px] before:top-1/2 before:w-3 before:h-px before:bg-white/10">CO₂ Level</a>
                 </div>
             </div>
 
-            <!-- History Log -->
-            <div class="card history-card">
-                <p class="card-title">Recent Log History</p>
-                <div class="table-container">
-                    <table class="history-table">
-                        <thead>
-                            <tr>
-                                <th>Time</th>
-                                <th>Soil</th>
-                                <th>Temp</th>
-                                <th>Hum</th>
-                                <th>CO₂</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="history-tbody">
+            <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-[16px] text-white/70 hover:text-white hover:bg-white/5 font-bold text-[14px] uppercase tracking-wider transition-colors">
+                <i data-lucide="file-text" class="w-[18px] h-[18px]" stroke-width="2.5"></i>
+                Reports
+            </a>
+
+            <a href="#" class="flex items-center justify-between px-4 py-3 rounded-[16px] text-white/70 hover:text-white hover:bg-white/5 font-bold text-[14px] uppercase tracking-wider transition-colors">
+                <div class="flex items-center gap-3">
+                    <i data-lucide="sliders" class="w-[18px] h-[18px]" stroke-width="2.5"></i>
+                    Controls
+                </div>
+                <i data-lucide="chevron-down" class="w-4 h-4"></i>
+            </a>
+
+            <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-[16px] text-white/70 hover:text-white hover:bg-white/5 font-bold text-[14px] uppercase tracking-wider transition-colors">
+                <i data-lucide="settings" class="w-[18px] h-[18px]" stroke-width="2.5"></i>
+                Settings
+            </a>
+        </nav>
+
+        <!-- Sidebar Footer -->
+        <div class="p-4 border-t border-white/10 flex items-center justify-between text-white/50">
+            <button class="p-2 hover:text-white hover:bg-white/10 rounded-full transition-colors"><i data-lucide="settings" class="w-[18px] h-[18px]"></i></button>
+            <button class="p-2 hover:text-white hover:bg-white/10 rounded-full transition-colors"><i data-lucide="maximize" class="w-[18px] h-[18px]"></i></button>
+            <button class="p-2 hover:text-white hover:bg-white/10 rounded-full transition-colors"><i data-lucide="bell" class="w-[18px] h-[18px]"></i></button>
+            <a href="/logout" class="p-2 hover:text-[#d03238] hover:bg-[#d03238]/10 rounded-full transition-colors"><i data-lucide="log-out" class="w-[18px] h-[18px]"></i></a>
+        </div>
+    </aside>
+
+    <!-- ==================== MAIN CONTENT ==================== -->
+    <div class="flex-1 flex flex-col min-w-0">
+
+        <!-- TOP HEADER -->
+        <header class="h-[72px] bg-white border-b shadow-[0_0_0_1px_rgba(14,15,12,0.05)] border-transparent shrink-0 flex justify-between items-center px-6 z-10">
+            <div class="flex items-center gap-4">
+                <button class="md:hidden p-2 text-[#0e0f0c] hover:bg-black/5 rounded-full transition-colors">
+                    <i data-lucide="menu" class="w-6 h-6"></i>
+                </button>
+                <div class="hidden md:flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-[#054d28] animate-pulse-dot"></span>
+                    <span class="text-[12px] font-bold text-[#868685] uppercase tracking-wider">Last Reading: <span id="last-seen-time">--:--</span></span>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-6">
+                <div class="flex items-center gap-2 px-3 py-1.5 bg-[#cdffad]/50 rounded-full shadow-[0_0_0_1px_rgba(14,15,12,0.05)] border border-[#9fe870]">
+                    <i data-lucide="check-circle-2" class="w-4 h-4 text-[#054d28]"></i>
+                    <span id="system-status-badge" class="text-[10px] font-bold uppercase tracking-widest text-[#054d28] pt-0.5">System Normal</span>
+                </div>
+
+                <button class="relative text-[#0e0f0c] hover:text-[#454745] transition-colors">
+                    <i data-lucide="bell" class="w-6 h-6"></i>
+                    <span class="absolute -top-1 -right-1 w-4 h-4 bg-[#d03238] text-white text-[9px] font-black rounded-full flex items-center justify-center border-2 border-white">3</span>
+                </button>
+
+                <div class="hidden sm:flex items-center gap-3 border-l border-[#868685]/20 pl-6 cursor-pointer">
+                    <div class="text-right">
+                        <p class="font-bold text-[12px] uppercase">System Admin</p>
+                        <p class="text-[10px] uppercase font-bold tracking-widest text-[#868685]">Manager</p>
+                    </div>
+                    <div class="w-9 h-9 rounded-full bg-[#163300] text-[#9fe870] flex items-center justify-center">
+                        <i data-lucide="user" class="w-[18px] h-[18px]"></i>
+                    </div>
+                    <i data-lucide="chevron-down" class="w-[14px] h-[14px] text-[#868685]"></i>
+                </div>
+
+                <!-- Mobile logout -->
+                <a href="/logout" class="sm:hidden p-2 text-[#0e0f0c] hover:text-[#d03238] transition-colors">
+                    <i data-lucide="log-out" class="w-5 h-5"></i>
+                </a>
+            </div>
+        </header>
+
+        <!-- DASHBOARD SCROLLABLE CONTENT -->
+        <main class="flex-1 overflow-x-hidden overflow-y-auto p-6 md:p-8 bg-[#e8ebe6] custom-scroll">
+            <div class="max-w-[1600px] mx-auto space-y-6 md:space-y-8">
+
+                <!-- ===== ROW 1: 4 METRIC CARDS ===== -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
+
+                    <!-- Card 1: Soil Moisture -->
+                    <div class="bg-white rounded-[24px] p-6 shadow-[0_0_0_1px_rgba(14,15,12,0.12)] flex flex-col justify-between relative overflow-hidden group">
+                        <div class="flex justify-between items-start z-10 relative">
+                            <div class="flex items-baseline gap-1">
+                                <span id="moisture-val" class="text-[48px] md:text-[56px] font-display">--</span>
+                                <span class="text-[20px] font-display text-[#163300]">%</span>
+                            </div>
+                            <div class="w-12 h-12 rounded-full bg-[#9fe870] flex items-center justify-center text-[#163300] shadow-sm group-hover:scale-110 transition-transform">
+                                <i data-lucide="wind" class="w-6 h-6" stroke-width="2.5"></i>
+                            </div>
+                        </div>
+                        <div class="mt-8 z-10 relative">
+                            <h3 class="text-[14px] font-bold uppercase tracking-wider text-[#0e0f0c]">Soil Moisture</h3>
+                            <p class="text-[11px] font-semibold text-[#868685] uppercase tracking-wider mt-1">Actual Soil Moisture Content</p>
+                        </div>
+                        <div class="absolute -bottom-10 -right-10 w-32 h-32 bg-[#9fe870]/20 rounded-full blur-2xl group-hover:bg-[#9fe870]/40 transition-colors"></div>
+                    </div>
+
+                    <!-- Card 2: Air Temperature -->
+                    <div class="bg-white rounded-[24px] p-6 shadow-[0_0_0_1px_rgba(14,15,12,0.12)] flex flex-col justify-between relative overflow-hidden group">
+                        <div class="flex justify-between items-start z-10 relative">
+                            <div class="flex items-baseline gap-1">
+                                <span id="temp-val" class="text-[48px] md:text-[56px] font-display">--</span>
+                                <span class="text-[20px] font-display text-[#163300]">°C</span>
+                            </div>
+                            <div class="w-12 h-12 rounded-full bg-[#163300] flex items-center justify-center text-[#9fe870] shadow-sm group-hover:scale-110 transition-transform">
+                                <i data-lucide="thermometer" class="w-6 h-6" stroke-width="2.5"></i>
+                            </div>
+                        </div>
+                        <div class="mt-8 z-10 relative">
+                            <h3 class="text-[14px] font-bold uppercase tracking-wider text-[#0e0f0c]">Air Temperature</h3>
+                            <p class="text-[11px] font-semibold text-[#868685] uppercase tracking-wider mt-1">Average Ambient Temperature</p>
+                        </div>
+                    </div>
+
+                    <!-- Card 3: Air Humidity -->
+                    <div class="bg-white rounded-[24px] p-6 shadow-[0_0_0_1px_rgba(14,15,12,0.12)] flex flex-col justify-between relative overflow-hidden group">
+                        <div class="flex justify-between items-start z-10 relative">
+                            <div class="flex items-baseline gap-1">
+                                <span id="humidity-val" class="text-[48px] md:text-[56px] font-display">--</span>
+                                <span class="text-[20px] font-display text-[#163300]">%</span>
+                            </div>
+                            <div class="w-12 h-12 rounded-full bg-[#054d28] flex items-center justify-center text-white shadow-sm group-hover:scale-110 transition-transform">
+                                <i data-lucide="droplets" class="w-6 h-6" stroke-width="2.5"></i>
+                            </div>
+                        </div>
+                        <div class="mt-8 z-10 relative">
+                            <h3 class="text-[14px] font-bold uppercase tracking-wider text-[#0e0f0c]">Air Humidity</h3>
+                            <p class="text-[11px] font-semibold text-[#868685] uppercase tracking-wider mt-1">Amount of Water in Air</p>
+                        </div>
+                    </div>
+
+                    <!-- Card 4: CO₂ Level (Accent) -->
+                    <div class="bg-[#e2f6d5] border border-[#9fe870]/50 rounded-[24px] p-6 shadow-[0_0_0_1px_rgba(14,15,12,0.12)] flex flex-col justify-between relative overflow-hidden group">
+                        <div class="flex justify-between items-start z-10 relative">
+                            <div class="flex items-baseline gap-1">
+                                <span id="co2-val" class="text-[48px] md:text-[56px] font-display">--</span>
+                                <span class="text-[20px] font-display text-[#163300]">ppm</span>
+                            </div>
+                            <div class="w-12 h-12 rounded-[12px] bg-white flex items-center justify-center text-[#163300] shadow-sm group-hover:scale-110 transition-transform">
+                                <i data-lucide="activity" class="w-6 h-6" stroke-width="2.5"></i>
+                            </div>
+                        </div>
+                        <div class="mt-8 z-10 relative">
+                            <h3 class="text-[14px] font-bold uppercase tracking-wider text-[#0e0f0c]">CO₂ Level</h3>
+                            <p class="text-[11px] font-semibold text-[#868685] uppercase tracking-wider mt-1">MQ-135 Gas Sensor Status</p>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- ===== ROW 2: CHART + LOG PANEL ===== -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
+
+                    <!-- CHART AREA -->
+                    <div class="lg:col-span-2 bg-white rounded-[30px] p-6 md:p-8 shadow-[0_0_0_1px_rgba(14,15,12,0.12)] flex flex-col">
+                        <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-8 gap-4 border-b border-[#e8ebe6] pb-4">
+                            <div>
+                                <h2 class="text-[28px] md:text-[36px] font-display uppercase">Daily Summary</h2>
+                                <h3 class="text-[14px] font-bold text-[#868685] uppercase tracking-wider mt-3">Temperature & Soil Moisture</h3>
+                            </div>
+                            <div class="flex gap-4">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-4 h-4 rounded-full border-[3px] border-[#9fe870] bg-white"></div>
+                                    <span class="text-[11px] font-bold uppercase tracking-widest text-[#0e0f0c]">Humidity</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <div class="w-4 h-4 rounded-full border-[3px] border-[#163300] bg-white"></div>
+                                    <span class="text-[11px] font-bold uppercase tracking-widest text-[#0e0f0c]">Temperature</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex-1 min-h-[250px] md:min-h-[350px]">
+                            <canvas id="sensor-chart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- LAST LOGGED PANEL -->
+                    <div class="bg-white rounded-[30px] p-6 md:p-8 shadow-[0_0_0_1px_rgba(14,15,12,0.12)] flex flex-col h-full">
+                        <div class="flex items-center justify-between mb-8 border-b border-[#e8ebe6] pb-4">
+                            <h2 class="text-[28px] md:text-[36px] font-display uppercase">Last Logged</h2>
+                            <button class="text-[#868685] hover:text-[#0e0f0c] transition-colors">
+                                <i data-lucide="settings" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+
+                        <div id="log-list" class="flex-1 overflow-y-auto pr-2 space-y-6 custom-scroll">
                             <!-- Injected via JS -->
-                        </tbody>
-                    </table>
+                            <div class="text-center py-12">
+                                <p class="text-[14px] font-bold text-[#868685] uppercase tracking-wider">No logs yet</p>
+                                <p class="text-[11px] font-semibold text-[#868685] uppercase tracking-wider mt-2">Waiting for sensor data...</p>
+                            </div>
+                        </div>
+
+                        <div class="mt-8 pt-4 border-t border-[#e8ebe6]">
+                            <button class="w-full py-3 rounded-full bg-[#163300]/5 text-[#163300] font-bold text-[12px] uppercase tracking-wider hover:bg-[#9fe870] transition-colors cursor-pointer">View All History</button>
+                        </div>
+                    </div>
+
                 </div>
+
+                <!-- ===== ROW 3: VISUAL ANALYSIS ===== -->
+                <div class="bg-white rounded-[30px] p-6 md:p-8 shadow-[0_0_0_1px_rgba(14,15,12,0.12)]">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4 border-b border-[#e8ebe6] pb-4">
+                        <div>
+                            <h2 class="text-[28px] md:text-[36px] font-display uppercase">Visual Analysis</h2>
+                            <h3 class="text-[14px] font-bold text-[#868685] uppercase tracking-wider mt-3">Latest Camera Capture</h3>
+                        </div>
+                        <div class="flex gap-3">
+                            <button onclick="forceAnalyze()" class="px-5 py-2.5 rounded-full bg-[#9fe870] text-[#163300] font-bold text-[12px] uppercase tracking-wider hover:scale-105 active:scale-95 transition-transform cursor-pointer border-none">
+                                <span class="flex items-center gap-2"><i data-lucide="scan" class="w-4 h-4"></i> Force Scan</span>
+                            </button>
+                            <button onclick="forceWater()" class="px-5 py-2.5 rounded-full bg-[#0e0f0c]/5 text-[#0e0f0c] font-bold text-[12px] uppercase tracking-wider hover:scale-105 active:scale-95 transition-transform cursor-pointer border-none">
+                                <span class="flex items-center gap-2"><i data-lucide="droplets" class="w-4 h-4"></i> Force Water</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="w-full h-[280px] bg-[#e8ebe6] rounded-[16px] overflow-hidden relative">
+                        <img id="latest-capture" src="" alt="Camera capture" class="w-full h-full object-cover hidden" />
+                        <div id="no-image" class="absolute inset-0 flex flex-col items-center justify-center gap-3 text-[#868685]">
+                            <i data-lucide="camera-off" class="w-10 h-10 opacity-40"></i>
+                            <p class="text-[14px] font-bold uppercase tracking-wider">No image available yet</p>
+                        </div>
+                    </div>
+                </div>
+
             </div>
+        </main>
+    </div>
 
-        </div>
+</div>
 
-    </main>
-
-    <script src="/static/js/app.js"></script>
+<!-- Initialize Lucide Icons -->
+<script>lucide.createIcons();</script>
+<script src="/static/js/app.js"></script>
 </body>
 </html>

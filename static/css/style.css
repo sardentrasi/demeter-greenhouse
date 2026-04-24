@@ -1,465 +1,67 @@
 /* ============================================
-   DEMETER DESIGN SYSTEM
-   Theme: "Natural Tones" × Wise Identity
+   DEMETER — Tailwind Overrides & Custom Tokens
    ============================================ */
 
-/* --- Design Tokens --- */
-:root {
-    /* Brand Primary */
-    --color-near-black: #0e0f0c;
-    --color-wise-green: #9fe870;
-    --color-dark-green: #163300;
-    --color-light-mint: #e2f6d5;
-    --color-pastel-green: #cdffad;
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@600;900&display=swap');
 
-    /* Semantic */
-    --color-positive: #054d28;
-    --color-danger: #d03238;
-    --color-warning: #ffd11a;
-    --color-info-tint: rgba(56, 200, 255, 0.10);
-    --color-bright-orange: #ffc091;
-
-    /* Neutrals */
-    --color-warm-dark: #454745;
-    --color-gray: #868685;
-    --color-light-surface: #e8ebe6;
-
-    /* Surfaces */
-    --color-bg: #f6f7f4;
-    --color-surface: #ffffff;
-    --color-card-sensor: var(--color-light-mint);
-
-    /* Shadows */
-    --shadow-ring: rgba(14, 15, 12, 0.12) 0px 0px 0px 1px;
-    --shadow-hover: rgba(14, 15, 12, 0.08) 0px 12px 32px -8px;
-
-    /* Radius */
-    --radius-small: 16px;
-    --radius-medium: 30px;
-    --radius-large: 40px;
-    --radius-pill: 9999px;
-
-    /* Typography */
-    --font-display: 'Inter', sans-serif;
-    --font-body: 'Inter', sans-serif;
-}
-
-/* --- Reset & Base --- */
-*, *::before, *::after {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
+::selection {
+    background: #9fe870;
+    color: #163300;
 }
 
 body {
-    background-color: var(--color-bg);
-    color: var(--color-near-black);
-    font-family: var(--font-body);
+    font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
     font-weight: 600;
-    font-size: 18px;
-    line-height: 1.44;
-    font-variant-ligatures: contextual;
     font-feature-settings: "calt" 1;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
 
-/* --- Typography Hierarchy --- */
-h1, h2, h3, h4 {
-    font-family: var(--font-display);
+/* Font Display — Arial Black as fallback for Wise Sans */
+.font-display {
+    font-family: 'Arial Black', 'Inter', ui-sans-serif, system-ui, sans-serif;
     font-weight: 900;
-    letter-spacing: -0.03em;
+    letter-spacing: -0.04em;
     line-height: 0.85;
-    text-transform: uppercase;
-    font-feature-settings: "calt" 1;
 }
 
-/* Page Title */
-h1 {
-    font-size: 64px;
+/* Pulse animation for status dot */
+@keyframes pulse-dot {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+}
+.animate-pulse-dot {
+    animation: pulse-dot 2s infinite;
 }
 
-/* Sub-heading / Section Title */
-h2 {
-    font-size: 40px;
-}
-
-/* Card Title */
-.card-title {
-    font-family: var(--font-body);
-    font-size: 16px;
-    font-weight: 600;
-    line-height: 1.25;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--color-warm-dark);
-    margin-bottom: 20px;
-}
-
-/* --- Header / Navigation --- */
-.header {
-    background-color: var(--color-surface);
-    padding: 20px 32px;
-    box-shadow: var(--shadow-ring);
-    position: sticky;
-    top: 0;
-    z-index: 100;
-}
-
-.header-content {
-    max-width: 1440px;
-    margin: 0 auto;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.header-brand {
-    display: flex;
-    align-items: baseline;
-    gap: 16px;
-}
-
-.header-brand h1 {
-    font-size: 28px;
-    line-height: 1;
-}
-
-.header-brand p {
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--color-gray);
-    text-transform: none;
-    letter-spacing: 0;
-}
-
-/* --- Layout --- */
-.container {
-    max-width: 1440px;
-    margin: 0 auto;
-    padding: 32px 32px 48px;
-}
-
-/* Dashboard Top Grid: 4 sensor cards */
-.dashboard-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 24px;
-    margin-bottom: 24px;
-}
-
-/* Content Grid: 2 columns */
-.content-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 24px;
-    margin-bottom: 40px;
-}
-
-/* Breakpoints */
-@media (max-width: 992px) {
-    .dashboard-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-    .content-grid {
-        grid-template-columns: 1fr;
-    }
-}
-
-@media (max-width: 576px) {
-    .dashboard-grid {
-        grid-template-columns: 1fr;
-    }
-    .container {
-        padding: 20px 16px;
-    }
-    h1 { font-size: 40px; }
-    h2 { font-size: 28px; }
-    .sensor-value { font-size: 72px !important; }
-    .header-brand p { display: none; }
-}
-
-/* --- Cards --- */
-.card {
-    background: var(--color-surface);
-    border-radius: var(--radius-medium);
-    padding: 32px;
-    box-shadow: var(--shadow-ring);
-    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.card:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--shadow-ring), var(--shadow-hover);
-}
-
-/* Sensor-specific cards get the mint background */
-.card-sensor {
-    background: var(--color-card-sensor);
-    border: 1px solid rgba(159, 232, 112, 0.35);
-}
-
-/* --- Sensor Display --- */
-.sensor-value {
-    font-family: var(--font-display);
-    font-size: 96px;
-    font-weight: 900;
-    line-height: 0.85;
-    color: var(--color-near-black);
-    letter-spacing: -0.03em;
-    font-feature-settings: "calt" 1;
-}
-
-.sensor-value .unit {
-    font-size: 36px;
-    font-weight: 600;
-    color: var(--color-warm-dark);
-    margin-left: 2px;
-}
-
-.sensor-label {
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--color-gray);
-    margin: 0;
-    margin-top: 8px;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-}
-
-/* Air condition multi-metric layout */
-.air-metrics {
-    display: flex;
-    gap: 24px;
-    margin-top: 8px;
-}
-
-.air-metric {
-    flex: 1;
-}
-
-.air-metric .sensor-value {
-    font-size: 56px;
-}
-
-.air-metric .sensor-value .unit {
-    font-size: 24px;
-}
-
-/* --- Status Card --- */
-.status-card {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-}
-
-.ai-status {
-    margin-bottom: 16px;
-}
-
-.badge {
-    display: inline-block;
-    padding: 6px 18px;
-    border-radius: var(--radius-pill);
-    font-size: 14px;
-    font-weight: 900;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    background: var(--color-light-surface);
-    color: var(--color-warm-dark);
-}
-
-.badge.siram {
-    background: var(--color-wise-green);
-    color: var(--color-dark-green);
-}
-
-.badge.diam {
-    background: var(--color-near-black);
-    color: var(--color-surface);
-}
-
-.badge.waiting {
-    background: var(--color-light-surface);
-    color: var(--color-gray);
-}
-
-.status-desc {
-    font-size: 16px;
-    font-weight: 600;
-    color: var(--color-near-black);
-    margin-bottom: 12px;
-}
-
-.last-seen {
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--color-gray);
-    letter-spacing: 0.02em;
-}
-
-/* --- Buttons --- */
-.btn-primary, .btn-secondary {
-    display: inline-block;
-    border: none;
-    padding: 12px 24px;
-    border-radius: var(--radius-pill);
-    font-size: 16px;
-    font-weight: 600;
-    font-family: var(--font-body);
-    font-feature-settings: "calt" 1;
-    cursor: pointer;
-    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    text-decoration: none;
-}
-
-.btn-primary {
-    background: var(--color-wise-green);
-    color: var(--color-dark-green);
-}
-
-.btn-secondary {
-    background: rgba(22, 51, 0, 0.08);
-    color: var(--color-near-black);
-}
-
-.btn-primary:hover, .btn-secondary:hover {
-    transform: scale(1.05);
-}
-
-.btn-primary:active, .btn-secondary:active {
-    transform: scale(0.95);
-}
-
-.btn-block {
-    width: 100%;
-    display: block;
-    text-align: center;
-}
-
-/* --- Image Container --- */
-.visual-card .actions {
-    margin-top: 24px;
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-}
-
-.image-container {
-    width: 100%;
-    height: 280px;
-    background: var(--color-light-surface);
-    border-radius: var(--radius-small);
-    overflow: hidden;
-    position: relative;
-}
-
-.image-container img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: none;
-}
-
-.no-image-placeholder {
+/* Timeline connector */
+.log-item:not(:last-child)::before {
+    content: '';
     position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 600;
-    font-size: 14px;
-    color: var(--color-gray);
+    left: 24px;
+    top: 48px;
+    bottom: 0;
+    width: 1px;
+    background: #e8ebe6;
 }
 
-/* --- Tables --- */
-.table-container {
-    max-height: 320px;
-    overflow-y: auto;
-}
+/* Scrollbar */
+.custom-scroll::-webkit-scrollbar { width: 6px; }
+.custom-scroll::-webkit-scrollbar-track { background: transparent; }
+.custom-scroll::-webkit-scrollbar-thumb { background: #e8ebe6; border-radius: 9999px; }
+.custom-scroll::-webkit-scrollbar-thumb:hover { background: #868685; }
 
-.history-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.history-table th, .history-table td {
-    padding: 10px 8px;
-    text-align: left;
-    border-bottom: 1px solid rgba(14, 15, 12, 0.06);
-    font-size: 13px;
-    white-space: nowrap;
-}
-
-.history-table th {
-    font-weight: 600;
-    color: var(--color-gray);
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    font-size: 11px;
-    position: sticky;
-    top: 0;
-    background: var(--color-surface);
-}
-
-.history-table td {
-    font-weight: 600;
-    color: var(--color-warm-dark);
-}
-
-/* --- Login Page --- */
-.login-wrapper {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-    padding: 24px;
-}
-
-.login-card {
-    width: 100%;
-    max-width: 420px;
-    padding: 48px 40px;
-    text-align: center;
-}
-
-.login-card h1 {
-    font-size: 48px;
-    margin-bottom: 8px;
-}
-
-.login-card .login-subtitle {
-    color: var(--color-gray);
-    font-size: 15px;
-    font-weight: 600;
-    margin-bottom: 40px;
-}
-
-.form-group {
-    margin-bottom: 20px;
-    text-align: left;
-}
-
-.form-group label {
-    display: block;
-    font-weight: 600;
-    font-size: 13px;
-    margin-bottom: 8px;
-    color: var(--color-warm-dark);
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-}
-
+/* Login overrides */
 .form-control {
     width: 100%;
     padding: 14px 16px;
-    border: 2px solid var(--color-light-surface);
-    border-radius: var(--radius-small);
-    font-family: var(--font-body);
+    border: 2px solid #e8ebe6;
+    border-radius: 16px;
+    font-family: 'Inter', sans-serif;
     font-size: 16px;
     font-weight: 600;
-    background: var(--color-bg);
-    color: var(--color-near-black);
+    background: #e8ebe6;
+    color: #0e0f0c;
     transition: border-color 0.2s, background-color 0.2s;
     box-sizing: border-box;
     font-feature-settings: "calt" 1;
@@ -467,37 +69,11 @@ h2 {
 
 .form-control:focus {
     outline: none;
-    border-color: var(--color-wise-green);
-    background-color: var(--color-surface);
+    border-color: #9fe870;
+    background: #ffffff;
 }
 
 .form-control::placeholder {
-    color: var(--color-gray);
+    color: #868685;
     font-weight: 600;
-}
-
-.error-message {
-    background-color: var(--color-danger);
-    color: white;
-    padding: 12px 16px;
-    border-radius: var(--radius-small);
-    font-weight: 600;
-    margin-bottom: 24px;
-    font-size: 14px;
-    text-align: left;
-}
-
-/* --- Scrollbar --- */
-.table-container::-webkit-scrollbar {
-    width: 6px;
-}
-.table-container::-webkit-scrollbar-track {
-    background: transparent;
-}
-.table-container::-webkit-scrollbar-thumb {
-    background: var(--color-light-surface);
-    border-radius: var(--radius-pill);
-}
-.table-container::-webkit-scrollbar-thumb:hover {
-    background: var(--color-gray);
 }
