@@ -25,10 +25,49 @@ body {
     line-height: 0.85;
 }
 
+/* Sidebar Submenu */
+#climatic-submenu, #controls-submenu {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out, opacity 0.3s;
+    opacity: 0;
+}
+
+#climatic-submenu.show, #controls-submenu.show {
+    max-height: 200px;
+    opacity: 1;
+}
+
+/* Chat Panel */
+#chat-panel {
+    display: none;
+}
+
+#chat-panel.show {
+    display: flex;
+}
+
+#chat-messages::-webkit-scrollbar { width: 4px; }
+#chat-messages::-webkit-scrollbar-thumb { background: rgba(14,15,12,0.1); border-radius: 10px; }
+
+/* Notification Dropdown */
+#notif-dropdown.show {
+    display: block;
+}
+
+.notif-item {
+    transition: background-color 0.2s;
+}
+
+.notif-item:hover {
+    background-color: #f3f5f2;
+}
+
 /* Pulse animation for status dot */
 @keyframes pulse-dot {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.4; }
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.5); opacity: 0.5; }
+    100% { transform: scale(1); opacity: 1; }
 }
 .animate-pulse-dot {
     animation: pulse-dot 2s infinite;

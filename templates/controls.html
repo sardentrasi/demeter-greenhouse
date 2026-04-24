@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+
+{% block title %}Demeter — Controls{% endblock %}
+
+{% block content %}
+<div class="mb-6">
+    <h1 class="text-[40px] md:text-[56px] font-display uppercase">Controls</h1>
+    <p class="text-[14px] font-bold text-[#868685] uppercase tracking-wider mt-3">Hardware command center</p>
+</div>
+
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+
+    <!-- Force Visual Scan -->
+    <div class="bg-white rounded-[24px] p-6 shadow-[0_0_0_1px_rgba(14,15,12,0.12)] flex flex-col">
+        <div class="flex items-center gap-3 mb-4">
+            <div class="w-12 h-12 rounded-full bg-[#9fe870] flex items-center justify-center text-[#163300]">
+                <i data-lucide="scan" class="w-6 h-6" stroke-width="2.5"></i>
+            </div>
+            <div>
+                <h3 class="text-[16px] font-bold uppercase tracking-wider">Force Scan</h3>
+                <p class="text-[11px] font-semibold text-[#868685] uppercase tracking-wider">Camera + AI Analysis</p>
+            </div>
+        </div>
+        <p class="text-[13px] font-semibold text-[#454745] mb-6 flex-1">Trigger a manual camera capture and AI analysis. Queues a command for the next ESP32 report cycle.</p>
+        <div id="scan-result" class="hidden mb-4 p-3 rounded-[12px] text-[12px] font-bold uppercase tracking-wider"></div>
+        <button id="btn-ctrl-scan" class="w-full py-3 rounded-full bg-[#9fe870] text-[#163300] font-bold text-[12px] uppercase tracking-wider hover:scale-105 active:scale-95 transition-transform cursor-pointer border-none">Execute Scan</button>
+    </div>
+
+    <!-- Force Water -->
+    <div class="bg-white rounded-[24px] p-6 shadow-[0_0_0_1px_rgba(14,15,12,0.12)] flex flex-col">
+        <div class="flex items-center gap-3 mb-4">
+            <div class="w-12 h-12 rounded-full bg-[#163300] flex items-center justify-center text-[#9fe870]">
+                <i data-lucide="droplets" class="w-6 h-6" stroke-width="2.5"></i>
+            </div>
+            <div>
+                <h3 class="text-[16px] font-bold uppercase tracking-wider">Force Water</h3>
+                <p class="text-[11px] font-semibold text-[#868685] uppercase tracking-wider">Activate Irrigation</p>
+            </div>
+        </div>
+        <p class="text-[13px] font-semibold text-[#454745] mb-6 flex-1">Queue an irrigation command. The relay will activate on the next ESP32 report with AI-determined duration.</p>
+        <div id="water-result" class="hidden mb-4 p-3 rounded-[12px] text-[12px] font-bold uppercase tracking-wider"></div>
+        <button id="btn-ctrl-water" class="w-full py-3 rounded-full bg-[#163300] text-[#9fe870] font-bold text-[12px] uppercase tracking-wider hover:scale-105 active:scale-95 transition-transform cursor-pointer border-none">Execute Irrigation</button>
+    </div>
+
+    <!-- Reset Cooldown -->
+    <div class="bg-white rounded-[24px] p-6 shadow-[0_0_0_1px_rgba(14,15,12,0.12)] flex flex-col">
+        <div class="flex items-center gap-3 mb-4">
+            <div class="w-12 h-12 rounded-full bg-[#054d28] flex items-center justify-center text-white">
+                <i data-lucide="timer-reset" class="w-6 h-6" stroke-width="2.5"></i>
+            </div>
+            <div>
+                <h3 class="text-[16px] font-bold uppercase tracking-wider">Reset Cooldown</h3>
+                <p class="text-[11px] font-semibold text-[#868685] uppercase tracking-wider">Clear Analysis Timer</p>
+            </div>
+        </div>
+        <p class="text-[13px] font-semibold text-[#454745] mb-6 flex-1">Reset the analysis cooldown timer so the next sensor report triggers an immediate AI evaluation.</p>
+        <div id="cooldown-result" class="hidden mb-4 p-3 rounded-[12px] text-[12px] font-bold uppercase tracking-wider"></div>
+        <button id="btn-ctrl-cooldown" class="w-full py-3 rounded-full bg-[#054d28] text-white font-bold text-[12px] uppercase tracking-wider hover:scale-105 active:scale-95 transition-transform cursor-pointer border-none">Reset Timer</button>
+    </div>
+
+</div>
+
+<!-- System Status -->
+<div class="bg-white rounded-[30px] p-6 md:p-8 shadow-[0_0_0_1px_rgba(14,15,12,0.12)] mt-6">
+    <h2 class="text-[28px] font-display uppercase mb-6">System State</h2>
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="bg-[#e8ebe6] rounded-[16px] p-4">
+            <p class="text-[10px] font-bold uppercase tracking-widest text-[#868685] mb-1">Command Queue</p>
+            <p id="sys-queue" class="text-[16px] font-bold">Empty</p>
+        </div>
+        <div class="bg-[#e8ebe6] rounded-[16px] p-4">
+            <p class="text-[10px] font-bold uppercase tracking-widest text-[#868685] mb-1">Next Analysis</p>
+            <p id="sys-next" class="text-[16px] font-bold">--</p>
+        </div>
+        <div class="bg-[#e8ebe6] rounded-[16px] p-4">
+            <p class="text-[10px] font-bold uppercase tracking-widest text-[#868685] mb-1">Last Action</p>
+            <p id="sys-action" class="text-[16px] font-bold">--</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    function showResult(elId, msg, isSuccess) {
+        const el = document.getElementById(elId);
+        el.textContent = msg;
+        el.className = `mb-4 p-3 rounded-[12px] text-[12px] font-bold uppercase tracking-wider ${isSuccess ? 'bg-[#e2f6d5] text-[#163300]' : 'bg-[#d03238]/10 text-[#d03238]'}`;
+        el.classList.remove('hidden');
+        setTimeout(() => el.classList.add('hidden'), 5000);
+    }
+
+    async function controlAction(endpoint, resultId, confirmMsg) {
+        if (!confirm(confirmMsg)) return;
+        try {
+            const res = await fetch(`/api/controls/${endpoint}`, { method: 'POST' });
+            const data = await res.json();
+            showResult(resultId, data.message || 'Command executed', data.success);
+        } catch(e) {
+            showResult(resultId, 'Network error', false);
+        }
+    }
+
+    document.getElementById('btn-ctrl-scan').addEventListener('click', () =>
+        controlAction('scan', 'scan-result', 'Trigger a forced visual scan + AI analysis?'));
+    document.getElementById('btn-ctrl-water').addEventListener('click', () =>
+        controlAction('water', 'water-result', '⚠️ This will activate the water pump! Are you sure?'));
+    document.getElementById('btn-ctrl-cooldown').addEventListener('click', () =>
+        controlAction('reset-cooldown', 'cooldown-result', 'Reset the analysis cooldown timer?'));
+
+    // Fetch system state
+    async function fetchSystemState() {
+        try {
+            const res = await fetch('/api/status');
+            const data = await res.json();
+            document.getElementById('sys-action').textContent = data.action || '--';
+            document.getElementById('sys-queue').textContent = data.command_queue ? 'Pending' : 'Empty';
+            document.getElementById('sys-next').textContent = data.next_analysis || '--';
+        } catch(e) {}
+    }
+    fetchSystemState();
+    setInterval(fetchSystemState, 5000);
+});
+</script>
+{% endblock %}

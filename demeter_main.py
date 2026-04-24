@@ -1,5 +1,6 @@
 import os
 import time
+import asyncio
 import threading
 import glob
 from datetime import datetime, timedelta
@@ -9,13 +10,17 @@ from dotenv import load_dotenv
 
 import core.state
 from core.state import (
-    logger, MOISTURE_SAFETY_LIMIT, HARD_COOLDOWN_HOURS, SOFT_COOLDOWN_HOURS, CAPTURE_DIR, DB_FILE
+    logger, MOISTURE_SAFETY_LIMIT, HARD_COOLDOWN_HOURS, SOFT_COOLDOWN_HOURS, CAPTURE_DIR, DB_FILE,
+    LLM_BASE_MODEL, DB_PATH
 )
 from core.utils import update_short_memory, start_midnight_cleanup_scheduler, log_data
 from core.vision import capture_visual, get_previous_image
 from core.ai_consultant import consult_demeter
 from core.telegram_bot import run_telegram_bot, kirim_telegram_sync
-from core.database import init_db, get_latest_history
+from core.database import (
+    init_db, get_latest_history, get_sensor_timeseries, get_sensor_stats,
+    get_daily_reports, insert_notification, get_unread_notifications, mark_notifications_read
+)
 
 load_dotenv()
 
@@ -159,6 +164,7 @@ def handle_report():
                         
                         if action == "SIRAM":
                             pesan = f"💦 **DEMETER ACTIVE** ({status_msg})\n🌱 Tanah: {moist}%\n🌡️ Suhu: {temp}°C"
+                            insert_notification('irrigation', f'Irrigation activated. Soil: {moist}%, Temp: {temp}°C')
                             try:
                                 kirim_telegram_sync(pesan, img_path)
                             except Exception as tg_err:
@@ -220,7 +226,7 @@ def logout():
 @app.route('/')
 @login_required
 def index():
-    return render_template('index.html')
+    return render_template('index.html', active_page='dashboard')
 
 @app.route('/api/status')
 @login_required
@@ -229,6 +235,10 @@ def api_status():
     list_files = sorted(glob.glob(os.path.join(CAPTURE_DIR, "*.jpg")))
     if list_files:
         latest_img = os.path.basename(list_files[-1])
+    
+    next_analysis = None
+    if isinstance(core.state.NEXT_ANALYSIS_TIME, datetime):
+        next_analysis = core.state.NEXT_ANALYSIS_TIME.isoformat()
         
     return jsonify({
         "moisture": core.state.LATEST_DATA.get("moisture", 0),
@@ -238,22 +248,193 @@ def api_status():
         "last_seen": core.state.LATEST_DATA.get("last_seen").isoformat() if isinstance(core.state.LATEST_DATA.get("last_seen"), datetime) else None,
         "action": core.state.LATEST_DATA.get("action", "WAITING"),
         "status": core.state.LATEST_DATA.get("status", "BOOT"),
-        "latest_image": latest_img
+        "latest_image": latest_img,
+        "command_queue": bool(core.state.COMMAND_QUEUE),
+        "next_analysis": next_analysis
     })
 
 @app.route('/api/history')
 @login_required
 def api_history():
     history = get_latest_history(limit=20)
-    # The database already returns the records in DESC order (newest first)
-    # The frontend app.js reverses it again to append to the bottom of the table
-    # So we are good.
     return jsonify(history)
 
 @app.route('/vision_capture/<path:filename>')
 @login_required
 def serve_capture(filename):
     return send_from_directory(CAPTURE_DIR, filename)
+
+# --- CLIMATIC DATA ---
+SENSOR_CONFIGS = {
+    'temperature': {'title': 'Temperature', 'subtitle': 'Ambient Air Temperature Readings', 'unit': '°C', 'color': '#163300'},
+    'humidity':    {'title': 'Air Humidity', 'subtitle': 'Relative Humidity Readings', 'unit': '%', 'color': '#054d28'},
+    'moisture':    {'title': 'Soil Moisture', 'subtitle': 'Capacitive Sensor Readings', 'unit': '%', 'color': '#9fe870'},
+    'co2':         {'title': 'CO₂ Level', 'subtitle': 'MQ-135 Gas Sensor Readings', 'unit': 'ppm', 'color': '#0e0f0c'},
+}
+
+@app.route('/climatic/<sensor_type>')
+@login_required
+def climatic_page(sensor_type):
+    if sensor_type not in SENSOR_CONFIGS:
+        return redirect(url_for('index'))
+    return render_template('climatic.html',
+        active_page=f'climatic_{sensor_type}',
+        sensor_type=sensor_type,
+        sensor_config=SENSOR_CONFIGS[sensor_type]
+    )
+
+@app.route('/api/climatic/<sensor_type>')
+@login_required
+def api_climatic(sensor_type):
+    hours = request.args.get('hours', 24, type=int)
+    timeseries = get_sensor_timeseries(sensor_type, hours)
+    stats = get_sensor_stats(sensor_type, hours)
+    return jsonify({'timeseries': timeseries, 'stats': stats})
+
+# --- REPORTS ---
+@app.route('/reports')
+@login_required
+def reports_page():
+    return render_template('reports.html', active_page='reports')
+
+@app.route('/api/reports')
+@login_required
+def api_reports():
+    days = request.args.get('days', 30, type=int)
+    reports = get_daily_reports(days)
+    return jsonify(reports)
+
+# --- CONTROLS ---
+@app.route('/controls')
+@login_required
+def controls_page():
+    return render_template('controls.html', active_page='controls')
+
+@app.route('/api/controls/scan', methods=['POST'])
+@login_required
+def api_control_scan():
+    if core.state.COMMAND_QUEUE:
+        return jsonify({'success': False, 'message': 'A command is already queued. Wait for it to complete.'})
+    core.state.COMMAND_QUEUE = {'action': 'ANALYZE', 'duration': 0, 'source': 'dashboard'}
+    insert_notification('control', 'Manual scan triggered from dashboard')
+    logger.info("[DASHBOARD] Force scan command queued.")
+    return jsonify({'success': True, 'message': 'Scan command queued. Will execute on next ESP32 report.'})
+
+@app.route('/api/controls/water', methods=['POST'])
+@login_required
+def api_control_water():
+    if core.state.COMMAND_QUEUE:
+        return jsonify({'success': False, 'message': 'A command is already queued. Wait for it to complete.'})
+    core.state.COMMAND_QUEUE = {'action': 'ANALYZE', 'duration': 0, 'source': 'dashboard_water'}
+    insert_notification('control', 'Manual irrigation triggered from dashboard')
+    logger.info("[DASHBOARD] Force water command queued.")
+    return jsonify({'success': True, 'message': 'Water command queued. Will execute on next ESP32 report.'})
+
+@app.route('/api/controls/reset-cooldown', methods=['POST'])
+@login_required
+def api_control_reset_cooldown():
+    core.state.NEXT_ANALYSIS_TIME = datetime.min
+    insert_notification('control', 'Cooldown timer reset from dashboard')
+    logger.info("[DASHBOARD] Cooldown timer reset.")
+    return jsonify({'success': True, 'message': 'Cooldown timer reset. Next report will trigger analysis.'})
+
+# --- SETTINGS ---
+@app.route('/settings')
+@login_required
+def settings_page():
+    return render_template('settings.html', active_page='settings')
+
+@app.route('/api/settings', methods=['GET'])
+@login_required
+def api_get_settings():
+    return jsonify({
+        'moisture_safety_limit': core.state.MOISTURE_SAFETY_LIMIT,
+        'hard_cooldown_hours': core.state.HARD_COOLDOWN_HOURS,
+        'soft_cooldown_hours': core.state.SOFT_COOLDOWN_HOURS,
+        'llm_model': os.getenv('LLM_BASE_MODEL', 'unknown'),
+        'db_path': DB_PATH,
+        'capture_dir': CAPTURE_DIR
+    })
+
+@app.route('/api/settings', methods=['POST'])
+@login_required
+def api_save_settings():
+    try:
+        data = request.json
+        if 'moisture_safety_limit' in data:
+            core.state.MOISTURE_SAFETY_LIMIT = float(data['moisture_safety_limit'])
+        if 'hard_cooldown_hours' in data:
+            core.state.HARD_COOLDOWN_HOURS = float(data['hard_cooldown_hours'])
+        if 'soft_cooldown_hours' in data:
+            core.state.SOFT_COOLDOWN_HOURS = float(data['soft_cooldown_hours'])
+        logger.info(f"[SETTINGS] Updated: moisture_limit={core.state.MOISTURE_SAFETY_LIMIT}, hard_cd={core.state.HARD_COOLDOWN_HOURS}h, soft_cd={core.state.SOFT_COOLDOWN_HOURS}h")
+        return jsonify({'success': True, 'message': 'Settings saved (runtime only).'})
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)})
+
+# --- AI CHAT ---
+@app.route('/api/chat', methods=['POST'])
+@login_required
+def api_chat():
+    """Chat with Demeter AI — same engine as Telegram /chat"""
+    user_msg = request.json.get('message', '').strip()
+    if not user_msg:
+        return jsonify({'reply': 'Please enter a message.'})
+    
+    try:
+        # Load persona
+        persona = "You are Demeter, the Garden AI."
+        persona_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "persona_demeter.md")
+        if os.path.exists(persona_path):
+            with open(persona_path, "r", encoding="utf-8") as f:
+                persona = f.read()
+        persona = persona.replace("{sender}", "Dashboard Operator")
+        
+        # Record user message to memory
+        if len(user_msg) > 5:
+            core.state.global_brain.record(
+                text=user_msg, user_name="Dashboard Operator",
+                source="dashboard_chat", tags="demeter, dashboard_chat"
+            )
+        
+        # Run async chat in sync context
+        loop = asyncio.new_event_loop()
+        reply = loop.run_until_complete(
+            core.state.global_brain.chat_with_langchain(
+                query=user_msg,
+                system_persona=persona,
+                user_name="Dashboard Operator",
+                filter_type="demeter"
+            )
+        )
+        loop.close()
+        
+        # Record AI reply to memory
+        if len(reply) > 20:
+            core.state.global_brain.record(
+                text=f"DEMETER to Dashboard: {reply}",
+                user_name="Demeter",
+                source="demeter_chat",
+                tags="ai_response_dashboard"
+            )
+        
+        return jsonify({'reply': reply})
+    except Exception as e:
+        logger.error(f"[CHAT ERROR] {e}")
+        return jsonify({'reply': f'⚠️ Communication error: {str(e)}'})
+
+# --- NOTIFICATIONS ---
+@app.route('/api/notifications')
+@login_required
+def api_notifications():
+    notifs = get_unread_notifications()
+    return jsonify(notifs)
+
+@app.route('/api/notifications/read', methods=['POST'])
+@login_required
+def api_mark_notifications_read():
+    mark_notifications_read()
+    return jsonify({'success': True})
 
 def run_flask():
     logger.info("[SYSTEM] Starting Flask Server (Daemon)...")
