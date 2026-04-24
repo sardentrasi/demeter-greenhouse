@@ -633,8 +633,6 @@ class GaiaBrain:
         Supports RAG filtering.
         """
         from langchain_core.messages import HumanMessage, SystemMessage
-        from langchain_core.prompts import ChatPromptTemplate
-        from langchain_community.chat_models import ChatLiteLLM
         
         # 1. RAG Retrieval
         context_str = self.remember(query, n_results=5, filter_type=filter_type)
@@ -642,11 +640,16 @@ class GaiaBrain:
         # 2. Setup LLM
         # Use LLM_MODEL from env (likely OpenRouter)
         try:
+            try:
+                from langchain_litellm import ChatLiteLLM
+            except ImportError:
+                from langchain_community.chat_models import ChatLiteLLM
+            
             llm = ChatLiteLLM(
                 model=os.getenv("LLM_BASE_MODEL", "gemini/gemini-2.0-flash"),
                 api_key=os.getenv("LLM_API_KEY"),
                 api_base=os.getenv("LLM_BASE_URL"),
-                verbose=True
+                verbose=False # Set to False in prod to reduce log spam
             )
             
             # 3. Construct Prompt

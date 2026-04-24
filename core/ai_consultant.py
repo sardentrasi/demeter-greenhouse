@@ -44,6 +44,8 @@ def consult_demeter(moisture, temp, current_img, prev_img):
     {{
         "action": "SIRAM" atau "DIAM",
         "duration_sec": 5,
+        "health_score": "Excellent" atau "Good" atau "Fair" atau "Poor",
+        "estimated_height_cm": 15.5,
         "reason": "Paragraf analisa lengkap (3-4 kalimat) berdasarkan panduan visual di atas. Sertakan observasi daun dan tanah."
     }}
     """

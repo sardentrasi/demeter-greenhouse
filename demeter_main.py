@@ -74,13 +74,22 @@ def handle_report():
                         
                     log_data(moist, temp, action, img_path, humidity, co2)
                     
-                    reasoning = ai_result.get("reason", "Manual Override Evaluated")
-                    update_short_memory("User Commanded Check", f"Result: {action} | {reasoning}")
-                    
                     core.state.LATEST_DATA = {
                         "moisture": moist, "temp": temp, "last_seen": current_time,
                         "action": action, "status": status_msg
                     }
+                    
+                    # --- AUTOMATED GROWTH LOGGING ---
+                    health = ai_result.get('health_score', 'Good')
+                    height = ai_result.get('estimated_height_cm', 0)
+                    reasoning = ai_result.get("reason", "Manual Override Evaluated")
+                    insert_growth_log(
+                        plant_name="Greenhouse System", 
+                        height=height, 
+                        health=health, 
+                        notes=f"[AUTO-LOG via /status] {reasoning}",
+                        img_path=img_path
+                    )
                     
                     pesan = f"🟢 **Laporan Analisa Manual**\n💦 Tanah: {moist}%\n🌡️ Suhu: {temp}°C\n🤖 Keputusan AI: **{action}**\n\n*Catatan*: {reasoning}"
                     kirim_telegram_sync(pesan, img_path)
@@ -162,6 +171,17 @@ def handle_report():
                             clean_reason = ' '.join(reason.replace('\n', ' ').replace('*', '').replace('`', '').replace('_', ' ').split())
                             reason_snip = clean_reason[:4000] + '...' if len(clean_reason) > 4000 else clean_reason
                             update_short_memory(f"Autonomous Action ({task_type})", f"Dec: {action} (M:{moist}%, T:{temp}C) | AI: {reason_snip}")
+
+                            # --- AUTOMATED GROWTH LOGGING ---
+                            health = ai_result.get('health_score', 'Good')
+                            height = ai_result.get('estimated_height_cm', 0)
+                            insert_growth_log(
+                                plant_name="Greenhouse System", 
+                                height=height, 
+                                health=health, 
+                                notes=f"[AUTO-LOG via Analysis] {clean_reason}",
+                                img_path=img_path
+                            )
                         
                         if action == "SIRAM":
                             pesan = f"💦 **DEMETER ACTIVE** ({status_msg})\n🌱 Tanah: {moist}%\n🌡️ Suhu: {temp}°C"

@@ -67,9 +67,14 @@
 
         <!-- History -->
         <div class="bg-white rounded-[30px] p-6 md:p-8 shadow-[0_0_0_1px_rgba(14,15,12,0.12)]">
-            <h2 class="text-[24px] font-display uppercase mb-6 flex items-center gap-3">
-                <i data-lucide="history" class="text-[#163300]"></i> Timeline
-            </h2>
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4 border-b border-[#e8ebe6] pb-4">
+                <h2 class="text-[24px] font-display uppercase flex items-center gap-3">
+                    <i data-lucide="history" class="text-[#163300]"></i> Timeline
+                </h2>
+                <button id="btn-manual-scan" class="px-5 py-2.5 rounded-full bg-[#9fe870] text-[#163300] font-bold text-[12px] uppercase tracking-wider hover:scale-105 active:scale-95 transition-transform cursor-pointer border-none shadow-sm">
+                    <span class="flex items-center gap-2"><i data-lucide="scan" class="w-4 h-4"></i> Manual Analysis</span>
+                </button>
+            </div>
             <div id="growth-list" class="space-y-6">
                 <!-- Data will be loaded here -->
                 <p class="text-center py-12 text-[14px] font-bold text-[#868685] uppercase tracking-wider">Loading history...</p>
@@ -205,6 +210,21 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!msg) return;
         sendToAIConsultant(msg);
     });
+
+    // Manual Scan Trigger
+    const btnManualScan = document.getElementById('btn-manual-scan');
+    if (btnManualScan) {
+        btnManualScan.addEventListener('click', async () => {
+            if (!confirm('Trigger immediate visual analysis? Result will be auto-logged.')) return;
+            try {
+                const res = await fetch('/api/controls/scan', { method: 'POST' });
+                const data = await res.json();
+                alert(data.message);
+                // Refresh list after a delay to wait for ESP32 cycle
+                setTimeout(fetchHistory, 35000); 
+            } catch(e) { alert('Failed to trigger scan'); }
+        });
+    }
 
     async function sendToAIConsultant(msg) {
         addChatMessage(msg, true);
