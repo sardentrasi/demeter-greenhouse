@@ -15,8 +15,8 @@
     <header class="header">
         <div class="header-content" style="position: relative;">
             <h1>DEMETER AI</h1>
-            <p>Sistem Pengelola Biosfer Presisi (AI Agronomist)</p>
-            <a href="/logout" class="btn-secondary" style="position: absolute; right: 0; top: 50%; transform: translateY(-50%); text-decoration: none; font-size: 14px; padding: 10px 20px;">Keluar (Logout)</a>
+            <p>Precision Biosphere Management System (AI Agronomist)</p>
+            <a href="/logout" class="btn-secondary" style="position: absolute; right: 0; top: 50%; transform: translateY(-50%); text-decoration: none; font-size: 14px; padding: 10px 20px;">Logout</a>
         </div>
     </header>
 
@@ -24,30 +24,30 @@
         <div class="dashboard-grid">
             <!-- Sensor Data -->
             <div class="card">
-                <h2 class="card-title">Kondisi Tanah</h2>
+                <h2 class="card-title">Soil Condition</h2>
                 <div class="sensor-value">
                     <span id="moisture-val">--</span><span class="unit">%</span>
                 </div>
-                <p class="sensor-label">Kelembapan Tanah</p>
+                <p class="sensor-label">Soil Moisture</p>
             </div>
 
             <div class="card">
-                <h2 class="card-title">Kondisi Udara</h2>
+                <h2 class="card-title">Air Condition</h2>
                 <div class="sensor-value">
                     <span id="temp-val">--</span><span class="unit">°C</span>
                 </div>
-                <p class="sensor-label">Suhu Lingkungan</p>
+                <p class="sensor-label">Ambient Temperature</p>
             </div>
 
             <!-- AI Status -->
             <div class="card status-card">
-                <h2 class="card-title">Status AI / Tindakan</h2>
+                <h2 class="card-title">AI Status / Action</h2>
                 <div class="ai-status">
                     <span id="action-badge" class="badge">WAITING</span>
                 </div>
-                <p id="status-desc" class="status-desc">Menunggu pembaruan sistem...</p>
+                <p id="status-desc" class="status-desc">Waiting for system update...</p>
                 <div class="last-seen">
-                    Terakhir Sinkronisasi: <span id="last-seen-time">--:--:--</span>
+                    Last Synchronized: <span id="last-seen-time">--:--:--</span>
                 </div>
             </div>
         </div>
@@ -55,27 +55,27 @@
         <!-- Visual Analysis & History -->
         <div class="content-grid">
             <div class="card visual-card">
-                <h2 class="card-title">Analisis Visual Terakhir</h2>
+                <h2 class="card-title">Latest Visual Analysis</h2>
                 <div class="image-container">
-                    <img id="latest-capture" src="" alt="Menunggu tangkapan kamera..." />
-                    <div id="no-image" class="no-image-placeholder">Belum ada gambar tersedia</div>
+                    <img id="latest-capture" src="" alt="Waiting for camera capture..." />
+                    <div id="no-image" class="no-image-placeholder">No image available yet</div>
                 </div>
                 <div class="actions">
-                    <button class="btn-primary" onclick="forceAnalyze()">Pindai Ulang Visual</button>
-                    <button class="btn-secondary" onclick="forceWater()">Paksa Siram (Manual)</button>
+                    <button class="btn-primary" onclick="forceAnalyze()">Force Visual Scan</button>
+                    <button class="btn-secondary" onclick="forceWater()">Force Water (Manual)</button>
                 </div>
             </div>
 
             <div class="card history-card">
-                <h2 class="card-title">Riwayat Log (Terbaru)</h2>
+                <h2 class="card-title">Recent Log History</h2>
                 <div class="table-container">
                     <table class="history-table">
                         <thead>
                             <tr>
-                                <th>Waktu</th>
-                                <th>Tanah</th>
-                                <th>Suhu</th>
-                                <th>Aksi</th>
+                                <th>Time</th>
+                                <th>Soil</th>
+                                <th>Temp</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody id="history-tbody">

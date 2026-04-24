@@ -64,6 +64,7 @@ LLM_BASE_MODEL=gemini/gemini-2.0-flash
 LLM_BASE_URL=
 RTSP_URL=rtsp://user:pass@ip:port/stream
 MOISTURE_SAFETY_LIMIT=40
+DASHBOARD_USERNAME=admin
 DASHBOARD_PASSWORD=admin123
 ```
 

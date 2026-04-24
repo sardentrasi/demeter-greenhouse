@@ -78,7 +78,7 @@
 <body>
     <div class="card login-card">
         <h1>DEMETER</h1>
-        <p>Akses Terbatas: Biosfer Presisi</p>
+        <p>Restricted Access: Precision Biosphere</p>
         
         {% if error %}
         <div class="error-message">
@@ -88,10 +88,14 @@
 
         <form action="{{ url_for('login') }}" method="POST">
             <div class="form-group">
-                <label for="password">Security Protocol (Password)</label>
-                <input type="password" id="password" name="password" class="form-control" placeholder="Masukkan kata sandi..." required autofocus>
+                <label for="username">Operator ID (Username)</label>
+                <input type="text" id="username" name="username" class="form-control" placeholder="Enter username..." required autofocus>
             </div>
-            <button type="submit" class="btn-primary btn-block">Masuk ke Sistem</button>
+            <div class="form-group">
+                <label for="password">Security Protocol (Password)</label>
+                <input type="password" id="password" name="password" class="form-control" placeholder="Enter password..." required>
+            </div>
+            <button type="submit" class="btn-primary btn-block">Login to System</button>
         </form>
     </div>
 </body>

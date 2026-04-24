@@ -198,13 +198,15 @@ def handle_report():
 def login():
     error = None
     if request.method == 'POST':
+        username = request.form.get('username')
         password = request.form.get('password')
+        correct_username = os.getenv('DASHBOARD_USERNAME', 'admin')
         correct_password = os.getenv('DASHBOARD_PASSWORD', 'admin123')
-        if password == correct_password:
+        if username == correct_username and password == correct_password:
             session['logged_in'] = True
             return redirect(url_for('index'))
         else:
-            error = "Password salah."
+            error = "Invalid username or password."
     return render_template('login.html', error=error)
 
 @app.route('/logout')
