@@ -1,14 +1,42 @@
 /* ============================================
-   DEMETER — Tailwind Overrides & Custom Tokens
+   DEMETER — Wise Design System Implementation
+   Color Scheme & Typography per WISE_DESIGN.md
    ============================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@600;900&display=swap');
+/* Import Inter with all required weights: 400 (body), 600 (body semibold/default), 900 (display fallback) */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&display=swap');
 
-::selection {
-    background: #9fe870;
-    color: #163300;
+/* --- CSS Custom Properties (from WISE_DESIGN.md §2) --- */
+:root {
+    /* Primary Brand */
+    --near-black: #0e0f0c;
+    --wise-green: #9fe870;
+    --dark-green: #163300;
+    --light-mint: #e2f6d5;
+    --pastel-green: #cdffad;
+
+    /* Semantic */
+    --positive-green: #054d28;
+    --danger-red: #d03238;
+    --warning-yellow: #ffd11a;
+
+    /* Neutral */
+    --warm-dark: #454745;
+    --gray: #868685;
+    --light-surface: #e8ebe6;
+
+    /* Shadows (§6 — ring shadows only) */
+    --ring-shadow: rgba(14,15,12,0.12) 0px 0px 0px 1px;
+    --ring-shadow-inset: rgb(134,134,133) 0px 0px 0px 1px inset;
 }
 
+/* --- Selection --- */
+::selection {
+    background: var(--wise-green);
+    color: var(--dark-green);
+}
+
+/* --- Body: Inter weight 600 default, "calt" everywhere (§3) --- */
 body {
     font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
     font-weight: 600;
@@ -17,15 +45,112 @@ body {
     -moz-osx-font-smoothing: grayscale;
 }
 
-/* Font Display — Arial Black as fallback for Wise Sans */
+/* --- Font Display: Wise Sans fallback = Arial Black (§3) --- */
+/* Weight 900, line-height 0.85 (ultra-tight), "calt" enabled */
 .font-display {
     font-family: 'Arial Black', 'Inter', ui-sans-serif, system-ui, sans-serif;
     font-weight: 900;
-    letter-spacing: -0.04em;
     line-height: 0.85;
+    letter-spacing: -0.04em;
+    font-feature-settings: "calt" 1;
 }
 
-/* Sidebar Submenu */
+/* ============================================
+   COMPONENT: Buttons (§4 — Buttons)
+   ============================================ */
+
+/* Primary Green Pill: #9fe870 bg, #163300 text, 9999px radius */
+/* Hover: scale(1.05), Active: scale(0.95) */
+.btn-wise {
+    background-color: var(--wise-green);
+    color: var(--dark-green);
+    border: none;
+    border-radius: 9999px;
+    padding: 5px 16px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 18px;
+    font-feature-settings: "calt" 1;
+    letter-spacing: -0.108px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.btn-wise:hover { transform: scale(1.05); }
+.btn-wise:active { transform: scale(0.95); }
+.btn-wise:focus-visible {
+    outline: 2px solid var(--dark-green);
+    outline-offset: 2px;
+}
+
+/* Secondary Subtle Pill: dark green at 8% opacity */
+.btn-wise-secondary {
+    background-color: rgba(22, 51, 0, 0.08);
+    color: var(--near-black);
+    border: none;
+    border-radius: 9999px;
+    padding: 8px 16px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-feature-settings: "calt" 1;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.btn-wise-secondary:hover { transform: scale(1.05); }
+.btn-wise-secondary:active { transform: scale(0.95); }
+
+/* ============================================
+   COMPONENT: Cards (§4 — Cards & Containers)
+   ============================================ */
+
+/* 30px radius, ring shadow only */
+.wise-card {
+    background: white;
+    border-radius: 30px;
+    box-shadow: var(--ring-shadow);
+    padding: 24px;
+}
+@media (min-width: 768px) {
+    .wise-card { padding: 32px; }
+}
+
+/* ============================================
+   COMPONENT: Form Controls
+   ============================================ */
+.form-control {
+    width: 100%;
+    padding: 14px 16px;
+    border: 2px solid var(--light-surface);
+    border-radius: 16px;
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    background: var(--light-surface);
+    color: var(--near-black);
+    transition: border-color 0.2s, background-color 0.2s;
+    box-sizing: border-box;
+    font-feature-settings: "calt" 1;
+}
+.form-control:focus {
+    outline: none;
+    border-color: var(--wise-green);
+    background: #ffffff;
+}
+.form-control::placeholder {
+    color: var(--gray);
+    font-weight: 600;
+}
+
+/* ============================================
+   LAYOUT: Sidebar
+   ============================================ */
 #sidebar {
     background-color: #131611;
     transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s ease-in-out;
@@ -35,45 +160,21 @@ body {
     top: 0;
 }
 
-/* Desktop Styles */
+/* Desktop Sidebar */
 @media (min-width: 768px) {
-    #sidebar {
-        position: relative;
-    }
-    
-    #sidebar.minimized {
-        width: 84px;
-    }
-    
+    #sidebar { position: relative; }
+    #sidebar.minimized { width: 84px; }
     #sidebar.minimized .sidebar-text,
     #sidebar.minimized .sidebar-tag,
-    #sidebar.minimized .user-info {
-        display: none;
-    }
-    
-    #sidebar.minimized nav {
-        padding-left: 12px;
-        padding-right: 12px;
-    }
-    
-    #sidebar.minimized a, #sidebar.minimized button {
-        justify-content: center;
-        padding-left: 0;
-        padding-right: 0;
-    }
+    #sidebar.minimized .user-info { display: none; }
+    #sidebar.minimized nav { padding-left: 12px; padding-right: 12px; }
+    #sidebar.minimized a, #sidebar.minimized button { justify-content: center; padding-left: 0; padding-right: 0; }
 }
 
-/* Mobile Styles */
+/* Mobile Sidebar (drawer) */
 @media (max-width: 767px) {
-    #sidebar {
-        transform: translateX(-100%);
-        width: 280px;
-    }
-    
-    #sidebar.mobile-open {
-        transform: translateX(0);
-        box-shadow: 20px 0 50px rgba(0,0,0,0.5);
-    }
+    #sidebar { transform: translateX(-100%); width: 280px; }
+    #sidebar.mobile-open { transform: translateX(0); box-shadow: 20px 0 50px rgba(0,0,0,0.5); }
 }
 
 #sidebar-backdrop {
@@ -84,19 +185,10 @@ body {
     backdrop-filter: blur(4px);
     z-index: 15;
 }
+#sidebar-backdrop.show { display: block; }
 
-#sidebar-backdrop.show {
-    display: block;
-}
-
-#sidebar.minimized .sidebar-brand-text {
-    display: none;
-}
-
-#sidebar.minimized .sidebar-brand-container {
-    justify-content: center;
-}
-
+#sidebar.minimized .sidebar-brand-text { display: none; }
+#sidebar.minimized .sidebar-brand-container { justify-content: center; }
 #sidebar.minimized #btn-sidebar-toggle {
     position: absolute;
     bottom: -40px;
@@ -105,54 +197,40 @@ body {
     background: rgba(255,255,255,0.05);
 }
 
+/* ============================================
+   LAYOUT: Submenu Accordion
+   ============================================ */
 #climatic-submenu, #controls-submenu {
     max-height: 0;
     overflow: hidden;
     transition: max-height 0.3s ease-out, opacity 0.3s;
     opacity: 0;
 }
-
 #climatic-submenu.show, #controls-submenu.show {
     max-height: 200px;
     opacity: 1;
 }
 
-/* Chat Panel */
-#chat-panel {
-    display: none;
-}
+/* ============================================
+   COMPONENT: Notification Dropdown
+   ============================================ */
+#notif-dropdown.show { display: block; }
+.notif-item { transition: background-color 0.2s; }
+.notif-item:hover { background-color: #f3f5f2; }
 
-#chat-panel.show {
-    display: flex;
-}
-
-#chat-messages::-webkit-scrollbar { width: 4px; }
-#chat-messages::-webkit-scrollbar-thumb { background: rgba(14,15,12,0.1); border-radius: 10px; }
-
-/* Notification Dropdown */
-#notif-dropdown.show {
-    display: block;
-}
-
-.notif-item {
-    transition: background-color 0.2s;
-}
-
-.notif-item:hover {
-    background-color: #f3f5f2;
-}
-
-/* Pulse animation for status dot */
+/* ============================================
+   ANIMATION: Pulse dot for status
+   ============================================ */
 @keyframes pulse-dot {
     0% { transform: scale(1); opacity: 1; }
     50% { transform: scale(1.5); opacity: 0.5; }
     100% { transform: scale(1); opacity: 1; }
 }
-.animate-pulse-dot {
-    animation: pulse-dot 2s infinite;
-}
+.animate-pulse-dot { animation: pulse-dot 2s infinite; }
 
-/* Timeline connector */
+/* ============================================
+   LAYOUT: Timeline connector
+   ============================================ */
 .log-item:not(:last-child)::before {
     content: '';
     position: absolute;
@@ -160,38 +238,17 @@ body {
     top: 48px;
     bottom: 0;
     width: 1px;
-    background: #e8ebe6;
+    background: var(--light-surface);
 }
 
-/* Scrollbar */
+/* ============================================
+   UTILITY: Scrollbar
+   ============================================ */
 .custom-scroll::-webkit-scrollbar { width: 6px; }
 .custom-scroll::-webkit-scrollbar-track { background: transparent; }
-.custom-scroll::-webkit-scrollbar-thumb { background: #e8ebe6; border-radius: 9999px; }
-.custom-scroll::-webkit-scrollbar-thumb:hover { background: #868685; }
+.custom-scroll::-webkit-scrollbar-thumb { background: var(--light-surface); border-radius: 9999px; }
+.custom-scroll::-webkit-scrollbar-thumb:hover { background: var(--gray); }
 
-/* Login overrides */
-.form-control {
-    width: 100%;
-    padding: 14px 16px;
-    border: 2px solid #e8ebe6;
-    border-radius: 16px;
-    font-family: 'Inter', sans-serif;
-    font-size: 16px;
-    font-weight: 600;
-    background: #e8ebe6;
-    color: #0e0f0c;
-    transition: border-color 0.2s, background-color 0.2s;
-    box-sizing: border-box;
-    font-feature-settings: "calt" 1;
-}
-
-.form-control:focus {
-    outline: none;
-    border-color: #9fe870;
-    background: #ffffff;
-}
-
-.form-control::placeholder {
-    color: #868685;
-    font-weight: 600;
-}
+/* Chat scrollbar (thinner) */
+#chat-messages::-webkit-scrollbar { width: 4px; }
+#chat-messages::-webkit-scrollbar-thumb { background: rgba(14,15,12,0.1); border-radius: 10px; }

@@ -8,74 +8,75 @@
 
 {% block content %}
 <!-- ===== ROW 1: 4 METRIC CARDS ===== -->
+<!-- Cards: 30px radius, ring shadow, scale(1.05) hover per §4 -->
 <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
 
     <!-- Card 1: Soil Moisture -->
-    <div class="bg-white rounded-[24px] p-6 shadow-[0_0_0_1px_rgba(14,15,12,0.12)] flex flex-col justify-between relative overflow-hidden group hover:-translate-y-1 transition-transform duration-300">
+    <div class="wise-card flex flex-col justify-between relative overflow-hidden group hover:scale-[1.02] transition-transform cursor-default">
         <div class="flex justify-between items-start z-10 relative">
             <div class="flex items-baseline gap-1">
                 <span id="moisture-val" class="text-[48px] md:text-[56px] font-display">--</span>
-                <span class="text-[20px] font-display text-[#163300]">%</span>
+                <span class="text-[18px] font-display text-[#163300]">%</span>
             </div>
-            <div class="w-12 h-12 rounded-full bg-[#9fe870] flex items-center justify-center text-[#163300] shadow-sm group-hover:scale-110 transition-transform">
+            <div class="w-12 h-12 rounded-full bg-[#9fe870] flex items-center justify-center text-[#163300] group-hover:scale-110 transition-transform">
                 <i data-lucide="wind" class="w-6 h-6" stroke-width="2.5"></i>
             </div>
         </div>
         <div class="mt-8 z-10 relative">
-            <h3 class="text-[14px] font-bold uppercase tracking-wider text-[#0e0f0c]">Soil Moisture</h3>
-            <p class="text-[11px] font-semibold text-[#868685] uppercase tracking-wider mt-1">Actual Soil Moisture Content</p>
+            <h3 class="text-[14px] font-semibold uppercase tracking-wider text-[#0e0f0c]">Soil Moisture</h3>
+            <p class="text-[12px] font-semibold text-[#868685] mt-1">Ground hydration level</p>
         </div>
-        <div class="absolute -bottom-10 -right-10 w-32 h-32 bg-[#9fe870]/20 rounded-full blur-2xl group-hover:bg-[#9fe870]/40 transition-colors"></div>
+        <div class="absolute -bottom-10 -right-10 w-32 h-32 bg-[#9fe870]/10 rounded-full blur-3xl group-hover:bg-[#9fe870]/20 transition-colors"></div>
     </div>
 
     <!-- Card 2: Air Temperature -->
-    <div class="bg-white rounded-[24px] p-6 shadow-[0_0_0_1px_rgba(14,15,12,0.12)] flex flex-col justify-between relative overflow-hidden group hover:-translate-y-1 transition-transform duration-300">
+    <div class="wise-card flex flex-col justify-between relative overflow-hidden group hover:scale-[1.02] transition-transform cursor-default">
         <div class="flex justify-between items-start z-10 relative">
             <div class="flex items-baseline gap-1">
                 <span id="temp-val" class="text-[48px] md:text-[56px] font-display">--</span>
-                <span class="text-[20px] font-display text-[#163300]">°C</span>
+                <span class="text-[18px] font-display text-[#163300]">°C</span>
             </div>
-            <div class="w-12 h-12 rounded-full bg-[#163300] flex items-center justify-center text-[#9fe870] shadow-sm group-hover:scale-110 transition-transform">
+            <div class="w-12 h-12 rounded-full bg-[#163300] flex items-center justify-center text-[#9fe870] group-hover:scale-110 transition-transform">
                 <i data-lucide="thermometer" class="w-6 h-6" stroke-width="2.5"></i>
             </div>
         </div>
         <div class="mt-8 z-10 relative">
-            <h3 class="text-[14px] font-bold uppercase tracking-wider text-[#0e0f0c]">Air Temperature</h3>
-            <p class="text-[11px] font-semibold text-[#868685] uppercase tracking-wider mt-1">Average Ambient Temperature</p>
+            <h3 class="text-[14px] font-semibold uppercase tracking-wider text-[#0e0f0c]">Air Temperature</h3>
+            <p class="text-[12px] font-semibold text-[#868685] mt-1">Ambient climate reading</p>
         </div>
     </div>
 
     <!-- Card 3: Air Humidity -->
-    <div class="bg-white rounded-[24px] p-6 shadow-[0_0_0_1px_rgba(14,15,12,0.12)] flex flex-col justify-between relative overflow-hidden group hover:-translate-y-1 transition-transform duration-300">
+    <div class="wise-card flex flex-col justify-between relative overflow-hidden group hover:scale-[1.02] transition-transform cursor-default">
         <div class="flex justify-between items-start z-10 relative">
             <div class="flex items-baseline gap-1">
                 <span id="humidity-val" class="text-[48px] md:text-[56px] font-display">--</span>
-                <span class="text-[20px] font-display text-[#163300]">%</span>
+                <span class="text-[18px] font-display text-[#163300]">%</span>
             </div>
-            <div class="w-12 h-12 rounded-full bg-[#054d28] flex items-center justify-center text-white shadow-sm group-hover:scale-110 transition-transform">
+            <div class="w-12 h-12 rounded-full bg-[#e2f6d5] flex items-center justify-center text-[#163300] group-hover:scale-110 transition-transform">
                 <i data-lucide="droplets" class="w-6 h-6" stroke-width="2.5"></i>
             </div>
         </div>
         <div class="mt-8 z-10 relative">
-            <h3 class="text-[14px] font-bold uppercase tracking-wider text-[#0e0f0c]">Air Humidity</h3>
-            <p class="text-[11px] font-semibold text-[#868685] uppercase tracking-wider mt-1">Amount of Water in Air</p>
+            <h3 class="text-[14px] font-semibold uppercase tracking-wider text-[#0e0f0c]">Air Humidity</h3>
+            <p class="text-[12px] font-semibold text-[#868685] mt-1">Atmospheric water vapor</p>
         </div>
     </div>
 
-    <!-- Card 4: CO₂ Level (Accent) -->
-    <div class="bg-[#e2f6d5] border border-[#9fe870]/50 rounded-[24px] p-6 shadow-[0_0_0_1px_rgba(14,15,12,0.12)] flex flex-col justify-between relative overflow-hidden group hover:-translate-y-1 transition-transform duration-300">
+    <!-- Card 4: CO₂ Level — Light Mint accent card -->
+    <div class="bg-[#e2f6d5] rounded-[30px] p-6 md:p-8 shadow-[0_0_0_1px_rgba(14,15,12,0.12)] border border-[#9fe870]/30 flex flex-col justify-between relative overflow-hidden group hover:scale-[1.02] transition-transform cursor-default">
         <div class="flex justify-between items-start z-10 relative">
             <div class="flex items-baseline gap-1">
                 <span id="co2-val" class="text-[48px] md:text-[56px] font-display">--</span>
-                <span class="text-[20px] font-display text-[#163300]">ppm</span>
+                <span class="text-[18px] font-display text-[#163300]">ppm</span>
             </div>
-            <div class="w-12 h-12 rounded-[12px] bg-white flex items-center justify-center text-[#163300] shadow-sm group-hover:scale-110 transition-transform">
+            <div class="w-12 h-12 rounded-full bg-white flex items-center justify-center text-[#163300] group-hover:scale-110 transition-transform">
                 <i data-lucide="activity" class="w-6 h-6" stroke-width="2.5"></i>
             </div>
         </div>
         <div class="mt-8 z-10 relative">
-            <h3 class="text-[14px] font-bold uppercase tracking-wider text-[#0e0f0c]">CO₂ Level</h3>
-            <p class="text-[11px] font-semibold text-[#868685] uppercase tracking-wider mt-1">MQ-135 Gas Sensor Status</p>
+            <h3 class="text-[14px] font-semibold uppercase tracking-wider text-[#0e0f0c]">CO₂ Level</h3>
+            <p class="text-[12px] font-semibold text-[#868685] mt-1">MQ-135 gas sensor</p>
         </div>
     </div>
 
@@ -84,12 +85,12 @@
 <!-- ===== ROW 2: CHART + LOG PANEL ===== -->
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
 
-    <!-- CHART AREA -->
-    <div class="lg:col-span-2 bg-white rounded-[30px] p-6 md:p-8 shadow-[0_0_0_1px_rgba(14,15,12,0.12)] flex flex-col">
+    <!-- CHART AREA — 30px radius card -->
+    <div class="lg:col-span-2 wise-card flex flex-col">
         <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-8 gap-4 border-b border-[#e8ebe6] pb-4">
             <div>
                 <h2 class="text-[28px] md:text-[36px] font-display uppercase">Daily Summary</h2>
-                <h3 class="text-[14px] font-bold text-[#868685] uppercase tracking-wider mt-3">Temperature & Soil Moisture</h3>
+                <h3 class="text-[14px] font-semibold text-[#868685] uppercase tracking-wider mt-3">Temperature & Soil Moisture</h3>
             </div>
             <div class="flex gap-4">
                 <div class="flex items-center gap-2">
@@ -108,7 +109,7 @@
     </div>
 
     <!-- LAST LOGGED PANEL -->
-    <div class="bg-white rounded-[30px] p-6 md:p-8 shadow-[0_0_0_1px_rgba(14,15,12,0.12)] flex flex-col h-full">
+    <div class="wise-card flex flex-col h-full">
         <div class="flex items-center justify-between mb-8 border-b border-[#e8ebe6] pb-4">
             <h2 class="text-[28px] md:text-[36px] font-display uppercase">Last Logged</h2>
             <span id="action-badge" class="text-[10px] font-bold uppercase tracking-widest bg-[#e8ebe6] text-[#454745] px-3 py-1.5 rounded-full">WAITING</span>
@@ -116,31 +117,31 @@
 
         <div id="log-list" class="flex-1 overflow-y-auto pr-2 space-y-6 custom-scroll">
             <div class="text-center py-12">
-                <p class="text-[14px] font-bold text-[#868685] uppercase tracking-wider">No logs yet</p>
-                <p class="text-[11px] font-semibold text-[#868685] uppercase tracking-wider mt-2">Waiting for sensor data...</p>
+                <p class="text-[14px] font-semibold text-[#868685] uppercase tracking-wider">No logs yet</p>
+                <p class="text-[12px] font-semibold text-[#868685] mt-2">Waiting for sensor data...</p>
             </div>
         </div>
 
         <div class="mt-8 pt-4 border-t border-[#e8ebe6]">
-            <a href="/reports" class="block w-full py-3 rounded-full bg-[#163300]/5 text-[#163300] font-bold text-[12px] uppercase tracking-wider hover:bg-[#9fe870] transition-colors text-center no-underline">View All History</a>
+            <a href="/reports" class="btn-wise-secondary block w-full py-3 text-[12px] uppercase tracking-wider text-center no-underline">View All History</a>
         </div>
     </div>
 
 </div>
 
 <!-- ===== ROW 3: VISUAL ANALYSIS ===== -->
-<div class="bg-white rounded-[30px] p-6 md:p-8 shadow-[0_0_0_1px_rgba(14,15,12,0.12)]">
+<div class="wise-card">
     <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4 border-b border-[#e8ebe6] pb-4">
         <div>
             <h2 class="text-[28px] md:text-[36px] font-display uppercase">Visual Analysis</h2>
-            <h3 class="text-[14px] font-bold text-[#868685] uppercase tracking-wider mt-3">Latest Camera Capture</h3>
+            <h3 class="text-[14px] font-semibold text-[#868685] uppercase tracking-wider mt-3">Latest Camera Capture</h3>
         </div>
         <div class="flex gap-3">
-            <button id="btn-force-scan" class="px-5 py-2.5 rounded-full bg-[#9fe870] text-[#163300] font-bold text-[12px] uppercase tracking-wider hover:scale-105 active:scale-95 transition-transform cursor-pointer border-none">
-                <span class="flex items-center gap-2"><i data-lucide="scan" class="w-4 h-4"></i> Force Scan</span>
+            <button id="btn-force-scan" class="btn-wise px-5 py-2.5 !text-[12px]">
+                <i data-lucide="scan" class="w-4 h-4"></i> Force Scan
             </button>
-            <button id="btn-force-water" class="px-5 py-2.5 rounded-full bg-[#0e0f0c]/5 text-[#0e0f0c] font-bold text-[12px] uppercase tracking-wider hover:scale-105 active:scale-95 transition-transform cursor-pointer border-none">
-                <span class="flex items-center gap-2"><i data-lucide="droplets" class="w-4 h-4"></i> Force Water</span>
+            <button id="btn-force-water" class="btn-wise-secondary px-5 py-2.5 text-[12px]">
+                <i data-lucide="droplets" class="w-4 h-4"></i> Force Water
             </button>
         </div>
     </div>
@@ -148,7 +149,7 @@
         <img id="latest-capture" src="" alt="Camera capture" class="w-full h-full object-cover hidden" />
         <div id="no-image" class="absolute inset-0 flex flex-col items-center justify-center gap-3 text-[#868685]">
             <i data-lucide="camera-off" class="w-10 h-10 opacity-40"></i>
-            <p class="text-[14px] font-bold uppercase tracking-wider">No image available yet</p>
+            <p class="text-[14px] font-semibold uppercase tracking-wider">No image available yet</p>
         </div>
     </div>
 </div>

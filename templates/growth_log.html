@@ -12,9 +12,9 @@
         flex-direction: column;
         height: calc(100vh - 180px);
         background: white;
-        border-radius: 24px;
+        border-radius: 30px;
         overflow: hidden;
-        border: 1px solid rgba(14,15,12,0.08);
+        box-shadow: rgba(14,15,12,0.12) 0px 0px 0px 1px;
     }
 </style>
 {% endblock %}
@@ -31,7 +31,7 @@
     <div class="lg:col-span-3 space-y-8">
         
         <!-- Log Form -->
-        <div class="bg-white rounded-[30px] p-6 md:p-8 shadow-[0_0_0_1px_rgba(14,15,12,0.12)]">
+        <div class="wise-card">
             <h2 class="text-[24px] font-display uppercase mb-6 flex items-center gap-3">
                 <i data-lucide="plus-circle" class="text-[#9fe870]"></i> New Entry
             </h2>
@@ -59,25 +59,25 @@
                     <label class="block text-[11px] font-bold uppercase tracking-widest text-[#454745] mb-2">Observation Notes</label>
                     <textarea id="plant-notes" class="form-control min-h-[100px]" placeholder="Add your observations here..."></textarea>
                 </div>
-                <button type="submit" class="w-full py-3 rounded-full bg-[#163300] text-[#9fe870] font-bold text-[14px] uppercase tracking-wider hover:scale-102 transition-transform">
+                <button type="submit" class="btn-wise w-full !py-3.5 !text-[14px] uppercase tracking-wider">
                     Save Growth Log
                 </button>
             </form>
         </div>
 
         <!-- History -->
-        <div class="bg-white rounded-[30px] p-6 md:p-8 shadow-[0_0_0_1px_rgba(14,15,12,0.12)]">
+        <div class="wise-card">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4 border-b border-[#e8ebe6] pb-4">
                 <h2 class="text-[24px] font-display uppercase flex items-center gap-3">
                     <i data-lucide="history" class="text-[#163300]"></i> Timeline
                 </h2>
-                <button id="btn-manual-scan" class="px-5 py-2.5 rounded-full bg-[#9fe870] text-[#163300] font-bold text-[12px] uppercase tracking-wider hover:scale-105 active:scale-95 transition-transform cursor-pointer border-none shadow-sm">
-                    <span class="flex items-center gap-2"><i data-lucide="scan" class="w-4 h-4"></i> Manual Analysis</span>
+                <button id="btn-manual-scan" class="btn-wise px-5 py-2.5 !text-[12px]">
+                    <i data-lucide="scan" class="w-4 h-4"></i> Manual Analysis
                 </button>
             </div>
             <div id="growth-list" class="space-y-6">
                 <!-- Data will be loaded here -->
-                <p class="text-center py-12 text-[14px] font-bold text-[#868685] uppercase tracking-wider">Loading history...</p>
+                <p class="text-center py-12 text-[14px] font-semibold text-[#868685] uppercase tracking-wider">Loading history...</p>
             </div>
         </div>
     </div>
