@@ -64,12 +64,13 @@ if TELEGRAM_CHAT_ID and int(TELEGRAM_CHAT_ID) not in ALLOWED_USERS:
 RTSP_URL = os.getenv("RTSP_URL")
 
 DB_FILE = os.getenv("DB_FILE", "data_logs/garden_history.csv")
+DB_PATH = os.getenv("DB_PATH", "data_logs/demeter.db")
 CAPTURE_DIR = os.getenv("CAPTURE_DIR", "vision_capture")
 MOISTURE_SAFETY_LIMIT = int(os.getenv("MOISTURE_SAFETY_LIMIT", 70))
 
 # GLOBAL VARIABLES
 LATEST_DATA = {
-    "moisture": 0, "temp": 0, "humidity": 0, "last_seen": datetime.min,
+    "moisture": 0, "temp": 0, "humidity": 0, "co2": 0, "last_seen": datetime.min,
     "action": "WAITING", "status": "BOOT"
 }
 LAST_LOG_TIME = datetime.min

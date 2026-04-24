@@ -5,6 +5,7 @@ import threading
 import time
 from datetime import datetime
 from core.state import logger
+from core.database import insert_sensor_data
 
 def update_short_memory(action: str, result: str) -> None:
     current_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -73,7 +74,11 @@ def start_midnight_cleanup_scheduler() -> None:
     scheduler_thread.start()
     logger.info("🕒 Midnight Cleanup Scheduler initialized.")
 
-def log_data(moist, temp, action, img_path, humidity=0):
+def log_data(moist, temp, action, img_path, humidity=0, co2=0):
+    # Log to SQLite (Source of Truth)
+    from core.database import insert_sensor_data
+    insert_sensor_data(moist, temp, humidity, co2, action, img_path)
+    
     from core.state import DB_FILE
     try:
         current_time = datetime.now()
@@ -82,7 +87,7 @@ def log_data(moist, temp, action, img_path, humidity=0):
         
         with open(DB_FILE, 'a') as f:
             if not file_exists:
-                f.write("timestamp,moisture,temp,action,img_path,humidity\n")
-            f.write(f"{current_time.strftime('%Y-%m-%d %H:%M:%S')},{moist},{temp},{action},{img_path},{humidity}\n")
+                f.write("timestamp,moisture,temp,action,img_path,humidity,co2\n")
+            f.write(f"{current_time.strftime('%Y-%m-%d %H:%M:%S')},{moist},{temp},{action},{img_path},{humidity},{co2}\n")
     except Exception as e:
         logger.error(f"❌ Failed to log data to CSV: {e}", exc_info=True)

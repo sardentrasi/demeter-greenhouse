@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const moistVal = document.getElementById('moisture-val');
     const tempVal = document.getElementById('temp-val');
     const humidityVal = document.getElementById('humidity-val');
+    const co2Val = document.getElementById('co2-val');
     const actionBadge = document.getElementById('action-badge');
     const statusDesc = document.getElementById('status-desc');
     const lastSeenTime = document.getElementById('last-seen-time');
@@ -20,6 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
             moistVal.textContent = data.moisture;
             tempVal.textContent = data.temp;
             if (humidityVal) humidityVal.textContent = data.humidity;
+            if (co2Val) co2Val.textContent = data.co2;
             
             // Format time
             if (data.last_seen) {
@@ -74,6 +76,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 const tdHum = document.createElement('td');
                 tdHum.textContent = (row.humidity || 0) + '%';
                 
+                const tdCo2 = document.createElement('td');
+                tdCo2.textContent = (row.co2 || 0) + 'ppm';
+                
                 const tdAction = document.createElement('td');
                 tdAction.textContent = row.action;
                 
@@ -81,6 +86,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 tr.appendChild(tdMoist);
                 tr.appendChild(tdTemp);
                 tr.appendChild(tdHum);
+                tr.appendChild(tdCo2);
                 tr.appendChild(tdAction);
                 
                 historyTbody.appendChild(tr);

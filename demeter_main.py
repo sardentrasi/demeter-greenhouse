@@ -15,6 +15,7 @@ from core.utils import update_short_memory, start_midnight_cleanup_scheduler, lo
 from core.vision import capture_visual, get_previous_image
 from core.ai_consultant import consult_demeter
 from core.telegram_bot import run_telegram_bot, kirim_telegram_sync
+from core.database import init_db, get_latest_history
 
 load_dotenv()
 
@@ -37,10 +38,11 @@ def handle_report():
         moist = data.get("moisture", 0)
         temp = data.get("temp", 0)
         humidity = data.get("humidity", 0)
+        co2 = data.get("co2", 0)
         
         current_time = datetime.now()
         
-        logger.info(f"📥 [ESP32] Laporan: Moisture={moist}%, Temp={temp}°C, Hum={humidity}%")
+        logger.info(f"📥 [ESP32] Laporan: Moisture={moist}%, Temp={temp}°C, Hum={humidity}%, CO2={co2}ppm")
         
         # Priority 1: User Request
         if core.state.COMMAND_QUEUE:
@@ -64,7 +66,7 @@ def handle_report():
                         core.state.NEXT_ANALYSIS_TIME = current_time + timedelta(hours=SOFT_COOLDOWN_HOURS)
                         status_msg = f"User Request: Analyzed (+{SOFT_COOLDOWN_HOURS}h)"
                         
-                    log_data(moist, temp, action, img_path, humidity)
+                    log_data(moist, temp, action, img_path, humidity, co2)
                     
                     reasoning = ai_result.get("reason", "Manual Override Evaluated")
                     update_short_memory("User Commanded Check", f"Result: {action} | {reasoning}")
@@ -147,7 +149,7 @@ def handle_report():
                         save_to_disk = True
 
                     if save_to_disk:
-                        log_data(moist, temp, action, img_path, humidity)
+                        log_data(moist, temp, action, img_path, humidity, co2)
                         
                         if task_type == 'AUTO':
                             reason = ai_result.get('reason', 'Routine check')
@@ -174,7 +176,7 @@ def handle_report():
                 update_short_memory("System Error", str(e))
 
             core.state.LATEST_DATA = {
-                "moisture": moist, "temp": temp, "humidity": humidity, "last_seen": current_time,
+                "moisture": moist, "temp": temp, "humidity": humidity, "co2": co2, "last_seen": current_time,
                 "action": action, "status": status_msg
             }
 
@@ -182,7 +184,7 @@ def handle_report():
 
         status_msg = "Sistem Sehat"
         core.state.LATEST_DATA = {
-            "moisture": moist, "temp": temp, "humidity": humidity, "last_seen": current_time,
+            "moisture": moist, "temp": temp, "humidity": humidity, "co2": co2, "last_seen": current_time,
             "action": "DIAM", "status": status_msg
         }
 
@@ -232,6 +234,7 @@ def api_status():
         "moisture": core.state.LATEST_DATA.get("moisture", 0),
         "temp": core.state.LATEST_DATA.get("temp", 0),
         "humidity": core.state.LATEST_DATA.get("humidity", 0),
+        "co2": core.state.LATEST_DATA.get("co2", 0),
         "last_seen": core.state.LATEST_DATA.get("last_seen").isoformat() if isinstance(core.state.LATEST_DATA.get("last_seen"), datetime) else None,
         "action": core.state.LATEST_DATA.get("action", "WAITING"),
         "status": core.state.LATEST_DATA.get("status", "BOOT"),
@@ -241,23 +244,10 @@ def api_status():
 @app.route('/api/history')
 @login_required
 def api_history():
-    history = []
-    try:
-        if os.path.exists(DB_FILE):
-            with open(DB_FILE, 'r') as f:
-                lines = f.readlines()[1:]
-                for line in lines[-20:]:
-                    parts = line.strip().split(',')
-                    if len(parts) >= 4:
-                        history.append({
-                            "timestamp": parts[0],
-                            "moisture": float(parts[1]) if parts[1].replace('.','',1).isdigit() else 0,
-                            "temp": float(parts[2]) if parts[2].replace('.','',1).isdigit() else 0,
-                            "action": parts[3],
-                            "humidity": float(parts[5]) if len(parts) >= 6 and parts[5].replace('.','',1).isdigit() else 0
-                        })
-    except Exception as e:
-        logger.error(f"[ERROR] API History: {e}")
+    history = get_latest_history(limit=20)
+    # The database already returns the records in DESC order (newest first)
+    # The frontend app.js reverses it again to append to the bottom of the table
+    # So we are good.
     return jsonify(history)
 
 @app.route('/vision_capture/<path:filename>')
@@ -273,6 +263,9 @@ def run_flask():
 # --- MAIN EXECUTION ---
 if __name__ == '__main__':
     logger.info("--- DEMETER V6.2 (MODULAR) ONLINE ---")
+    
+    # Initialize Database
+    init_db()
     
     flask_thread = threading.Thread(target=run_flask, daemon=True)
     flask_thread.start()
