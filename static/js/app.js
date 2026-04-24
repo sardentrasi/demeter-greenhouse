@@ -15,6 +15,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // DOM Elements - Logs
     const logList = document.getElementById('log-list');
 
+    // DOM Elements - Sidebar
+    const sidebar = document.getElementById('sidebar');
+    const sidebarToggle = document.getElementById('btn-sidebar-toggle');
+    const sidebarToggleIcon = document.getElementById('sidebar-toggle-icon');
+    
     // DOM Elements - Sidebar Submenu
     const climaticToggle = document.getElementById('btn-climatic-toggle');
     const climaticSubmenu = document.getElementById('climatic-submenu');
@@ -106,9 +111,41 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ===== SIDEBAR LOGIC =====
+    if (sidebarToggle) {
+        // Load preference
+        const isMinimized = localStorage.getItem('sidebar-minimized') === 'true';
+        if (isMinimized) {
+            sidebar.classList.add('minimized');
+            sidebarToggleIcon.setAttribute('data-lucide', 'chevron-right');
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        }
+
+        sidebarToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('minimized');
+            const nowMinimized = sidebar.classList.contains('minimized');
+            localStorage.setItem('sidebar-minimized', nowMinimized);
+            
+            sidebarToggleIcon.setAttribute('data-lucide', nowMinimized ? 'chevron-right' : 'chevron-left');
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+            
+            // Close submenus if minimizing
+            if (nowMinimized) {
+                climaticSubmenu.classList.remove('show');
+                climaticChevron.style.transform = 'rotate(0deg)';
+            }
+        });
+    }
+
     if (climaticToggle) {
         climaticToggle.addEventListener('click', (e) => {
             e.preventDefault();
+            // Don't open submenu if minimized
+            if (sidebar.classList.contains('minimized')) {
+                sidebar.classList.remove('minimized');
+                localStorage.setItem('sidebar-minimized', 'false');
+                sidebarToggleIcon.setAttribute('data-lucide', 'chevron-left');
+                if (typeof lucide !== 'undefined') lucide.createIcons();
+            }
             climaticSubmenu.classList.toggle('show');
             climaticChevron.style.transform = climaticSubmenu.classList.contains('show') ? 'rotate(180deg)' : 'rotate(0deg)';
         });
