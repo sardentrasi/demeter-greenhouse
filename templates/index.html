@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demeter AI Agronomist</title>
+    <!-- Use Google Fonts as fallback for Wise Sans / Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content" style="position: relative;">
+            <h1>DEMETER AI</h1>
+            <p>Sistem Pengelola Biosfer Presisi (AI Agronomist)</p>
+            <a href="/logout" class="btn-secondary" style="position: absolute; right: 0; top: 50%; transform: translateY(-50%); text-decoration: none; font-size: 14px; padding: 10px 20px;">Keluar (Logout)</a>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="dashboard-grid">
+            <!-- Sensor Data -->
+            <div class="card">
+                <h2 class="card-title">Kondisi Tanah</h2>
+                <div class="sensor-value">
+                    <span id="moisture-val">--</span><span class="unit">%</span>
+                </div>
+                <p class="sensor-label">Kelembapan Tanah</p>
+            </div>
+
+            <div class="card">
+                <h2 class="card-title">Kondisi Udara</h2>
+                <div class="sensor-value">
+                    <span id="temp-val">--</span><span class="unit">°C</span>
+                </div>
+                <p class="sensor-label">Suhu Lingkungan</p>
+            </div>
+
+            <!-- AI Status -->
+            <div class="card status-card">
+                <h2 class="card-title">Status AI / Tindakan</h2>
+                <div class="ai-status">
+                    <span id="action-badge" class="badge">WAITING</span>
+                </div>
+                <p id="status-desc" class="status-desc">Menunggu pembaruan sistem...</p>
+                <div class="last-seen">
+                    Terakhir Sinkronisasi: <span id="last-seen-time">--:--:--</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Visual Analysis & History -->
+        <div class="content-grid">
+            <div class="card visual-card">
+                <h2 class="card-title">Analisis Visual Terakhir</h2>
+                <div class="image-container">
+                    <img id="latest-capture" src="" alt="Menunggu tangkapan kamera..." />
+                    <div id="no-image" class="no-image-placeholder">Belum ada gambar tersedia</div>
+                </div>
+                <div class="actions">
+                    <button class="btn-primary" onclick="forceAnalyze()">Pindai Ulang Visual</button>
+                    <button class="btn-secondary" onclick="forceWater()">Paksa Siram (Manual)</button>
+                </div>
+            </div>
+
+            <div class="card history-card">
+                <h2 class="card-title">Riwayat Log (Terbaru)</h2>
+                <div class="table-container">
+                    <table class="history-table">
+                        <thead>
+                            <tr>
+                                <th>Waktu</th>
+                                <th>Tanah</th>
+                                <th>Suhu</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="history-tbody">
+                            <!-- Injected via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>

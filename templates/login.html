@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demeter AI - Login</title>
+    <!-- Use Google Fonts as fallback for Wise Sans / Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: var(--color-bg);
+            margin: 0;
+        }
+        .login-card {
+            width: 100%;
+            max-width: 400px;
+            padding: 40px;
+            text-align: center;
+        }
+        .login-card h1 {
+            font-size: 40px;
+            margin-bottom: 8px;
+        }
+        .login-card p {
+            color: var(--color-text-secondary);
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 32px;
+        }
+        .form-group {
+            margin-bottom: 24px;
+            text-align: left;
+        }
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--color-text-primary);
+        }
+        .form-control {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid rgba(14,15,12,0.12);
+            border-radius: var(--radius-small);
+            font-family: var(--font-sans);
+            font-size: 16px;
+            font-weight: 600;
+            transition: border-color 0.2s;
+            box-sizing: border-box;
+        }
+        .form-control:focus {
+            outline: none;
+            border-color: var(--color-accent-wise);
+        }
+        .btn-block {
+            width: 100%;
+            display: block;
+            margin-top: 16px;
+        }
+        .error-message {
+            background-color: var(--color-danger);
+            color: white;
+            padding: 12px;
+            border-radius: var(--radius-small);
+            font-weight: 600;
+            margin-bottom: 24px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="card login-card">
+        <h1>DEMETER</h1>
+        <p>Akses Terbatas: Biosfer Presisi</p>
+        
+        {% if error %}
+        <div class="error-message">
+            ⚠️ {{ error }}
+        </div>
+        {% endif %}
+
+        <form action="{{ url_for('login') }}" method="POST">
+            <div class="form-group">
+                <label for="password">Security Protocol (Password)</label>
+                <input type="password" id="password" name="password" class="form-control" placeholder="Masukkan kata sandi..." required autofocus>
+            </div>
+            <button type="submit" class="btn-primary btn-block">Masuk ke Sistem</button>
+        </form>
+    </div>
+</body>
+</html>
