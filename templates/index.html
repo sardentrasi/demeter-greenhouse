@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Demeter AI Agronomist</title>
-    <!-- Use Google Fonts as fallback for Wise Sans / Inter -->
+    <title>Demeter — Greenhouse Monitor</title>
+    <meta name="description" content="Demeter AI Agronomist — Precision Biosphere Management System">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&display=swap" rel="stylesheet">
@@ -12,78 +12,92 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <header class="header" style="padding: 24px 24px; margin-bottom: 24px;">
-        <div class="header-content" style="position: relative;">
-            <h1>DEMETER</h1>
-            <p>Precision Biosphere Management System</p>
-            <a href="/logout" class="btn-secondary" style="position: absolute; right: 0; top: 50%; transform: translateY(-50%); text-decoration: none; font-size: 14px; padding: 10px 20px;">Logout</a>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="header-brand">
+                <h1>DEMETER</h1>
+                <p>Precision Biosphere Management</p>
+            </div>
+            <a href="/logout" class="btn-secondary" id="btn-logout">Logout</a>
         </div>
     </header>
 
     <main class="container">
+
+        <!-- Sensor Cards Row -->
         <div class="dashboard-grid">
-            <!-- Sensor Data -->
-            <div class="card">
-                <h2 class="card-title">Soil Condition</h2>
+
+            <!-- Soil Moisture -->
+            <div class="card card-sensor">
+                <p class="card-title">Soil Moisture</p>
                 <div class="sensor-value">
                     <span id="moisture-val">--</span><span class="unit">%</span>
                 </div>
-                <p class="sensor-label">Soil Moisture</p>
+                <p class="sensor-label">Capacitive Sensor</p>
             </div>
 
-            <div class="card">
-                <h2 class="card-title">Air Condition</h2>
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
-                    <div>
-                        <div class="sensor-value" style="margin-bottom: 0;">
+            <!-- Air Condition -->
+            <div class="card card-sensor">
+                <p class="card-title">Air Condition</p>
+                <div class="air-metrics">
+                    <div class="air-metric">
+                        <div class="sensor-value">
                             <span id="temp-val">--</span><span class="unit">°C</span>
                         </div>
-                        <p class="sensor-label" style="margin-top: 5px;">Temperature</p>
+                        <p class="sensor-label">Temperature</p>
                     </div>
-                    <div style="text-align: center;">
-                        <div class="sensor-value" style="margin-bottom: 0;">
+                    <div class="air-metric">
+                        <div class="sensor-value">
                             <span id="humidity-val">--</span><span class="unit">%</span>
                         </div>
-                        <p class="sensor-label" style="margin-top: 5px;">Humidity</p>
+                        <p class="sensor-label">Humidity</p>
                     </div>
-                    <div style="text-align: right;">
-                        <div class="sensor-value" style="margin-bottom: 0;">
+                    <div class="air-metric">
+                        <div class="sensor-value">
                             <span id="co2-val">--</span><span class="unit">ppm</span>
                         </div>
-                        <p class="sensor-label" style="margin-top: 5px;">CO₂</p>
+                        <p class="sensor-label">CO₂</p>
                     </div>
                 </div>
             </div>
 
             <!-- AI Status -->
             <div class="card status-card">
-                <h2 class="card-title">AI Status / Action</h2>
-                <div class="ai-status">
-                    <span id="action-badge" class="badge">WAITING</span>
+                <div>
+                    <p class="card-title">AI Status</p>
+                    <div class="ai-status">
+                        <span id="action-badge" class="badge waiting">WAITING</span>
+                    </div>
+                    <p id="status-desc" class="status-desc">Waiting for system update...</p>
                 </div>
-                <p id="status-desc" class="status-desc">Waiting for system update...</p>
                 <div class="last-seen">
-                    Last Synchronized: <span id="last-seen-time">--:--:--</span>
+                    Last Sync: <span id="last-seen-time">--:--:--</span>
                 </div>
             </div>
+
         </div>
 
         <!-- Visual Analysis & History -->
         <div class="content-grid">
+
+            <!-- Visual Analysis -->
             <div class="card visual-card">
-                <h2 class="card-title">Latest Visual Analysis</h2>
+                <p class="card-title">Latest Visual Analysis</p>
                 <div class="image-container">
                     <img id="latest-capture" src="" alt="Waiting for camera capture..." />
                     <div id="no-image" class="no-image-placeholder">No image available yet</div>
                 </div>
                 <div class="actions">
-                    <button class="btn-primary" onclick="forceAnalyze()">Force Visual Scan</button>
-                    <button class="btn-secondary" onclick="forceWater()">Force Water (Manual)</button>
+                    <button class="btn-primary" id="btn-force-scan" onclick="forceAnalyze()">Force Visual Scan</button>
+                    <button class="btn-secondary" id="btn-force-water" onclick="forceWater()">Force Water</button>
                 </div>
             </div>
 
+            <!-- History Log -->
             <div class="card history-card">
-                <h2 class="card-title">Recent Log History</h2>
+                <p class="card-title">Recent Log History</p>
                 <div class="table-container">
                     <table class="history-table">
                         <thead>
@@ -102,7 +116,9 @@
                     </table>
                 </div>
             </div>
+
         </div>
+
     </main>
 
     <script src="/static/js/app.js"></script>
