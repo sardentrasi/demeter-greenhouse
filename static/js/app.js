@@ -223,84 +223,6 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch(e) {}
     }
 
-    // ===== AI CHAT LOGIC =====
-    if (chatFab) {
-        chatFab.addEventListener('click', () => chatPanel.classList.toggle('show'));
-        chatClose.addEventListener('click', () => chatPanel.classList.remove('show'));
-
-        chatForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const msg = chatInput.value.trim();
-            if (!msg) return;
-
-            // User Message
-            addChatMessage(msg, true);
-            chatInput.value = '';
-
-            // AI Loading
-            const loadingId = 'ai-loading-' + Date.now();
-            addChatLoading(loadingId);
-
-            try {
-                const res = await fetch('/api/chat', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: msg })
-                });
-                const data = await res.json();
-                
-                // Remove loading, add reply
-                document.getElementById(loadingId).remove();
-                addChatMessage(data.reply, false);
-            } catch (e) {
-                document.getElementById(loadingId).remove();
-                addChatMessage("⚠️ Communication error.", false);
-            }
-        });
-    }
-
-    function addChatMessage(text, isUser) {
-        const div = document.createElement('div');
-        div.className = isUser ? 'flex justify-end' : 'flex gap-3';
-        
-        if (isUser) {
-            div.innerHTML = `
-                <div class="bg-[#9fe870] text-[#163300] rounded-[16px] rounded-tr-[4px] px-4 py-3 max-w-[85%]">
-                    <p class="text-[13px] font-semibold">${text}</p>
-                </div>
-            `;
-        } else {
-            div.innerHTML = `
-                <div class="w-8 h-8 rounded-full bg-[#e2f6d5] text-[#163300] flex items-center justify-center shrink-0">
-                    <i data-lucide="bot" class="w-4 h-4" stroke-width="2.5"></i>
-                </div>
-                <div class="bg-[#e8ebe6] rounded-[16px] rounded-tl-[4px] px-4 py-3 max-w-[85%]">
-                    <p class="text-[13px] font-semibold">${text}</p>
-                </div>
-            `;
-        }
-        chatMessages.appendChild(div);
-        if (!isUser && typeof lucide !== 'undefined') lucide.createIcons();
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-    }
-
-    function addChatLoading(id) {
-        const div = document.createElement('div');
-        div.id = id;
-        div.className = 'flex gap-3';
-        div.innerHTML = `
-            <div class="w-8 h-8 rounded-full bg-[#e2f6d5] text-[#163300] flex items-center justify-center shrink-0 animate-pulse">
-                <i data-lucide="bot" class="w-4 h-4" stroke-width="2.5"></i>
-            </div>
-            <div class="bg-[#e8ebe6] rounded-[16px] rounded-tl-[4px] px-4 py-3">
-                <p class="text-[10px] font-bold uppercase tracking-widest text-[#868685]">Thinking...</p>
-            </div>
-        `;
-        chatMessages.appendChild(div);
-        if (typeof lucide !== 'undefined') lucide.createIcons();
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-    }
-
     // ===== STATUS POLLING =====
     async function fetchStatus() {
         try {
@@ -315,9 +237,23 @@ document.addEventListener('DOMContentLoaded', () => {
             if (data.last_seen) {
                 const dt = new Date(data.last_seen);
                 lastSeenTime.textContent = `${dt.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}, ${dt.toLocaleDateString('en-US', {month:'short', day:'numeric'})}`;
+                
+                // Sensor Connection Logic (within 60s is Online)
+                const diffSec = (new Date() - dt) / 1000;
+                if (diffSec < 65) {
+                    systemBadge.textContent = "Sensor Online";
+                    systemBadge.parentElement.className = "flex items-center gap-2 px-3 py-1.5 bg-[#cdffad]/50 rounded-full shadow-[0_0_0_1px_rgba(14,15,12,0.05)] border border-[#9fe870]";
+                    systemBadge.previousElementSibling.setAttribute('data-lucide', 'check-circle-2');
+                    systemBadge.previousElementSibling.className = "w-4 h-4 text-[#054d28]";
+                } else {
+                    systemBadge.textContent = "Sensor Offline";
+                    systemBadge.parentElement.className = "flex items-center gap-2 px-3 py-1.5 bg-[#ffdada]/50 rounded-full shadow-[0_0_0_1px_rgba(14,15,12,0.05)] border border-[#d03238]";
+                    systemBadge.previousElementSibling.setAttribute('data-lucide', 'alert-circle');
+                    systemBadge.previousElementSibling.className = "w-4 h-4 text-[#d03238]";
+                }
+                if (typeof lucide !== 'undefined') lucide.createIcons();
             }
 
-            if (systemBadge) systemBadge.textContent = data.status;
             if (actionBadge) actionBadge.textContent = data.action;
 
             if (latestCapture) {
