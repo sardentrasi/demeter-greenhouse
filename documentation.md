@@ -15,7 +15,55 @@ Demeter is built around a lightweight, modular architecture designed to run on a
 - **External Integrations**: Telegram Bot API
 - **Hardware**: ESP32 DevKitC v4 WROOM-32D, various environmental sensors
 
-## 3. System Requirements
+## 3. Architecture Overview
+Demeter operates on a modular, event-driven architecture where the Flask server acts as the central orchestrator (Brain), connecting hardware sensors, visual intelligence, and user interfaces.
+
+### System Flow Diagram
+```mermaid
+graph TD
+    subgraph "Edge Layer (Greenhouse)"
+        ESP32[ESP32 Microcontroller]
+        Sensors[Soil, Temp, Hum, CO2]
+        Pump[Water Pump / Relay]
+        Cam[RTSP Camera]
+    end
+
+    subgraph "Brain Layer (Server)"
+        Orch[Demeter Orchestrator - Flask]
+        Vision[Vision Module - OpenCV]
+        AI[AI Consultant - LiteLLM]
+        Mem[Memory Core - ChromaDB/SQLite]
+    end
+
+    subgraph "User Layer"
+        Dash[Web Dashboard]
+        Tele[Telegram Bot]
+    end
+
+    %% Flow connections
+    Sensors -->|Telemetry Data| ESP32
+    ESP32 -->|POST /lapor| Orch
+    Orch -->|Trigger Snapshot| Vision
+    Cam -->|RTSP Stream| Vision
+    Vision -->|Image Frame| Orch
+    Orch -->|Prompt + Data + Image| AI
+    AI -->|Action Decision| Orch
+    Orch -->|Command Response| ESP32
+    ESP32 -->|Control| Pump
+
+    %% Persistence & UI
+    Orch <--> Mem
+    Dash <--> Orch
+    Tele <--> Orch
+```
+
+### Component Interaction
+1.  **Edge to Server**: The ESP32 sends real-time telemetry. If the soil moisture drops below the safety limit, the server initiates an autonomous analysis.
+2.  **Visual Intelligence**: The server captures a frame from the RTSP camera and sends it along with sensor data to the AI.
+3.  **Closed-Loop Control**: The AI determines if watering is needed. The server then relays this decision back to the ESP32 in the HTTP response.
+4.  **Memory & RAG**: Every interaction is logged and embedded into ChromaDB, allowing the AI to "remember" past plant health trends and user instructions.
+
+## 4. System Requirements
 To run the Demeter server, ensure the following requirements are met:
 - **Operating System**: Linux (Ubuntu recommended) or Windows/macOS for development.
 - **Python**: Version 3.10 or higher.
@@ -23,7 +71,7 @@ To run the Demeter server, ensure the following requirements are met:
 - **Disk Space**: Sufficient space for data logs, ChromaDB vector store, and vision captures.
 - **Network**: Internet access for LLM APIs (LiteLLM) and Telegram Bot communication.
 
-## 4. Installation & Setup Guide
+## 5. Installation & Setup Guide
 
 ### 1. Clone & Dependencies
 Clone the repository and install the required Python packages:
@@ -66,7 +114,7 @@ For production environments, it is recommended to use **Gunicorn**:
 gunicorn --workers 4 --bind 0.0.0.0:5000 demeter_main:app
 ```
 
-## 5. Directory Structure
+## 6. Directory Structure
 - `/core`: Main operational packages (`state.py`, `ai_consultant.py`, `telegram_bot.py`, `vision.py`, `utils.py`, `memory_manager.py`, `database.py`).
 - `/templates`: Jinja2 HTML templates (`base.html`, `index.html`, `login.html`, `climatic.html`, `reports.html`, `controls.html`, `settings.html`, `growth_log.html`).
 - `/static`: Frontend assets and `app.js` logic.
@@ -76,7 +124,7 @@ gunicorn --workers 4 --bind 0.0.0.0:5000 demeter_main:app
 - `demeter_main.py`: Central Orchestrator (Flask routes and thread management).
 - `persona_demeter.md`: Dynamic prompt instructions for Demeter's AI logic.
 
-## 6. Hardware Setup & ESP32 Cabling
+## 7. Hardware Setup & ESP32 Cabling
 The hardware side runs on an **ESP32 DevKitC v4 WROOM-32D** microcontroller. It polls sensor data and sends POST requests to the server's `/lapor` webhook.
 
 ### Pinout & Cabling Guide
@@ -94,7 +142,7 @@ You must calibrate the following values in `esp32_firmware.ino` to ensure accura
 - `SOIL_WET_VALUE` (Default: `1200`): ADC reading when submerged in water.
 - `MQ135_RZERO` (Default: `76.63`): Sensor resistance in clean air.
 
-## 7. Core Workflows
+## 8. Core Workflows
 
 ### Hardware Sensor Polling
 1. The ESP32 gathers data from its sensors every 30 seconds (`REPORT_INTERVAL_MS`).
@@ -109,6 +157,6 @@ When an analysis is triggered (autonomously or via manual Telegram/Dashboard ove
 ### RAG Memory & Growth Log
 Significant events, AI decisions, and Telegram interactions are stored locally in `ChromaDB` (Memory Manager). The AI automatically logs plant height and health into the Growth Log based on its visual analyses. Hourly background heartbeats are filtered to avoid memory spam.
 
-## 8. Deployment Considerations
+## 9. Deployment Considerations
 - Demeter uses a stateful architecture. Global state (`COMMAND_QUEUE`, `LATEST_DATA`, `AI_PROCESSING_LOCK`) is handled centrally via `core/state.py` to ensure thread safety within Gunicorn or multi-threaded Flask.
 - Environmental variables (e.g., `LLM_API_KEY`, `LLM_BASE_MODEL`, WiFi credentials) must be properly defined in the `.env` file on the server and within the `esp32_firmware.ino` on the ESP32.
