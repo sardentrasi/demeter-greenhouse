@@ -101,5 +101,3 @@ python -m demeter.demeter_main
 Demeter is fully decentralized. She can operate as a "Garden Guardian" in **STANDALONE (Survival)** mode, managing irrigation and visual logs without external connectivity. See [README_STANDALONE.md](README_STANDALONE.md).
 
 ---
-
-_Status: 🌿 System Healthy_
