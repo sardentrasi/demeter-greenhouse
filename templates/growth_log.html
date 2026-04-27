@@ -1,276 +1,167 @@
-{% extends "base.html" %}
-
-{% block title %}Demeter — Plant Growth Log{% endblock %}
-
-{% block head_extra %}
-<style>
-    .chat-container {
-        display: flex;
-        flex-direction: column;
-        height: calc(100vh - 180px);
-        background: white;
-        border-radius: 24px;
-        overflow: hidden;
-        border: 1px solid rgba(0,0,0,0.05);
-        box-shadow: rgba(0,0,0,0.03) 0px 2px 4px;
-    }
-</style>
-{% endblock %}
-
+{% extends 'base.html' %}
 {% block content %}
-<div class="mb-6">
-    <h1 class="text-[40px] font-semibold tracking-[-0.8px] text-[#0d0d0d] leading-[1.1]">Growth Log</h1>
-    <p class="text-[16px] text-[#666666] mt-2">Track your plants and consult with AI</p>
+<div class='p-lg w-full'>
+<!-- Page Header -->
+<div class="mb-lg flex flex-col md:flex-row justify-between items-start md:items-end gap-6 border-b border-border-subtle pb-6">
+<div>
+<div class="flex items-center gap-3 mb-2">
+<span class="px-3 py-1 bg-brand-green-light rounded-full font-mono-code text-mono-code text-brand-green-deep uppercase tracking-wider">Active Specimen</span>
+<span class="font-mono-code text-mono-code text-gray-500">ID: B-7492-X</span>
 </div>
-
-<div class="grid grid-cols-1 lg:grid-cols-5 gap-6 items-start">
-    
-    <!-- LEFT: Form and History (3 columns) -->
-    <div class="lg:col-span-3 space-y-6">
-        
-        <!-- Log Form -->
-        <div class="mint-card-featured">
-            <h2 class="text-[20px] font-semibold tracking-[-0.2px] text-[#0d0d0d] mb-6 flex items-center gap-3">
-                <i data-lucide="plus-circle" class="w-5 h-5 text-[#18E299]"></i> New Entry
-            </h2>
-            <form id="growth-form" class="space-y-4">
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-[13px] font-medium text-[#666666] mb-2 tracking-[0.65px] uppercase">Plant Name</label>
-                        <input type="text" id="plant-name" class="form-control" placeholder="e.g. Tomato A1" required>
-                    </div>
-                    <div>
-                        <label class="block text-[13px] font-medium text-[#666666] mb-2 tracking-[0.65px] uppercase">Height (cm)</label>
-                        <input type="number" id="plant-height" class="form-control" placeholder="15.5" step="0.1">
-                    </div>
-                </div>
-                <div>
-                    <label class="block text-[13px] font-medium text-[#666666] mb-2 tracking-[0.65px] uppercase">Health Status</label>
-                    <select id="plant-health" class="form-control">
-                        <option value="Excellent">Excellent - Vibrant & Strong</option>
-                        <option value="Good" selected>Good - Steady Growth</option>
-                        <option value="Fair">Fair - Some Concerns</option>
-                        <option value="Poor">Poor - Needs Attention</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-[13px] font-medium text-[#666666] mb-2 tracking-[0.65px] uppercase">Observation Notes</label>
-                    <textarea id="plant-notes" class="form-control min-h-[100px]" placeholder="Add your observations here..."></textarea>
-                </div>
-                <button type="submit" class="btn-primary w-full !py-3 !text-[15px]">
-                    Save Growth Log
-                </button>
-            </form>
-        </div>
-
-        <!-- History -->
-        <div class="mint-card-featured">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4 pb-4 border-b border-black/[0.05]">
-                <h2 class="text-[20px] font-semibold tracking-[-0.2px] text-[#0d0d0d] flex items-center gap-3">
-                    <i data-lucide="history" class="w-5 h-5 text-[#666666]"></i> Timeline
-                </h2>
-                <button id="btn-manual-scan" class="btn-brand px-5 py-2 !text-[13px]">
-                    <i data-lucide="scan" class="w-4 h-4"></i> Manual Analysis
-                </button>
-            </div>
-            <div id="growth-list" class="space-y-4">
-                <p class="text-center py-12 text-[14px] font-medium text-[#888888]">Loading history...</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- RIGHT: AI Consultant (2 columns) -->
-    <div class="lg:col-span-2 lg:sticky lg:top-8">
-        <div class="chat-container">
-            <div class="bg-[#0d0d0d] text-white p-5 flex items-center gap-4">
-                <div class="w-10 h-10 rounded-full bg-[#18E299] text-[#0d0d0d] flex items-center justify-center">
-                    <i data-lucide="bot" class="w-5 h-5" stroke-width="2.5"></i>
-                </div>
-                <div>
-                    <p class="font-semibold text-[15px]">AI Agronomist</p>
-                    <p class="font-mono text-[10px] text-white/40">GROWTH SPECIALIST</p>
-                </div>
-            </div>
-            
-            <div id="page-chat-messages" class="flex-1 overflow-y-auto p-6 space-y-5 custom-scroll">
-                <div class="flex gap-3">
-                    <div class="w-8 h-8 rounded-full bg-[#d4fae8] text-[#0fa76e] flex items-center justify-center shrink-0">
-                        <i data-lucide="bot" class="w-4 h-4" stroke-width="2.5"></i>
-                    </div>
-                    <div class="bg-[#f5f5f5] rounded-[16px] rounded-tl-[4px] px-4 py-3 max-w-[85%]">
-                        <p class="text-[14px] leading-relaxed text-[#333333]">I've reviewed your plant logs. How can I help you optimize your greenhouse today?</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="p-5 border-t border-black/[0.05] bg-[#fafafa]">
-                <form id="page-chat-form" class="flex gap-3">
-                    <input type="text" id="page-chat-input" placeholder="Consult about your growth logs..." class="form-control flex-1 !py-3 !px-5 !text-[14px]" autocomplete="off">
-                    <button type="submit" class="btn-brand w-12 h-12 !p-0 shrink-0">
-                        <i data-lucide="send" class="w-5 h-5" stroke-width="2"></i>
-                    </button>
-                </form>
-            </div>
-        </div>
-    </div>
-
+<h2 class="font-section-heading text-section-heading text-near-black mb-2">Monstera Deliciosa Variegata</h2>
+<p class="font-body-large text-body-large text-gray-600 max-w-2xl">Overall growth trend is positive. Internodal spacing is optimized under current lighting regimen. No immediate pathogen threats detected.</p>
 </div>
-{% endblock %}
-
-{% block scripts %}
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-    const growthForm = document.getElementById('growth-form');
-    const growthList = document.getElementById('growth-list');
-    const chatForm = document.getElementById('page-chat-form');
-    const chatInput = document.getElementById('page-chat-input');
-    const chatMessages = document.getElementById('page-chat-messages');
-
-    // Fetch History
-    async function fetchHistory() {
-        try {
-            const res = await fetch('/api/growth-logs');
-            const data = await res.json();
-            
-            if (data.length === 0) {
-                growthList.innerHTML = '<p class="text-center py-12 text-[14px] font-medium text-[#888888]">No logs yet. Start by adding one!</p>';
-                return;
-            }
-
-            growthList.innerHTML = '';
-            data.forEach(log => {
-                const card = document.createElement('div');
-                card.className = 'mint-card flex flex-col gap-3 !p-5';
-                card.innerHTML = `
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <span class="font-mono text-[10px] text-[#888888]">${log.timestamp}</span>
-                            <h3 class="text-[16px] font-semibold text-[#0d0d0d] mt-1">${log.plant_name}</h3>
-                        </div>
-                        <span class="${getHealthBadge(log.health)} font-mono text-[10px]">${log.health}</span>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <i data-lucide="ruler" class="w-4 h-4 text-[#888888]"></i>
-                        <span class="text-[14px] font-medium text-[#0d0d0d]">${log.height} cm</span>
-                    </div>
-                    <p class="text-[13px] text-[#666666] leading-relaxed">${log.notes || 'No notes added.'}</p>
-                `;
-                growthList.appendChild(card);
-            });
-            lucide.createIcons();
-        } catch (e) { console.error(e); }
-    }
-
-    function getHealthBadge(status) {
-        if (status === 'Excellent') return 'badge-green';
-        if (status === 'Good') return 'badge-green';
-        if (status === 'Fair') return 'badge-amber';
-        return 'badge-red';
-    }
-
-    // Submit Form
-    growthForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const btn = e.target.querySelector('button');
-        btn.disabled = true;
-        btn.textContent = 'Saving...';
-
-        try {
-            const payload = {
-                plant_name: document.getElementById('plant-name').value,
-                height: parseFloat(document.getElementById('plant-height').value),
-                health: document.getElementById('plant-health').value,
-                notes: document.getElementById('plant-notes').value
-            };
-
-            const res = await fetch('/api/growth-logs', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-
-            if (res.ok) {
-                growthForm.reset();
-                fetchHistory();
-                sendToAIConsultant(`I just added a new growth log for ${payload.plant_name}. Height is ${payload.height}cm and status is ${payload.health}. Notes: ${payload.notes}. Any advice?`);
-            }
-        } catch (e) { alert('Failed to save log'); }
-        btn.disabled = false;
-        btn.textContent = 'Save Growth Log';
-    });
-
-    // Integrated Chat
-    chatForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const msg = chatInput.value.trim();
-        if (!msg) return;
-        sendToAIConsultant(msg);
-    });
-
-    // Manual Scan Trigger
-    const btnManualScan = document.getElementById('btn-manual-scan');
-    if (btnManualScan) {
-        btnManualScan.addEventListener('click', async () => {
-            if (!confirm('Trigger immediate visual analysis? Result will be auto-logged.')) return;
-            try {
-                const res = await fetch('/api/controls/scan', { method: 'POST' });
-                const data = await res.json();
-                alert(data.message);
-                setTimeout(fetchHistory, 35000); 
-            } catch(e) { alert('Failed to trigger scan'); }
-        });
-    }
-
-    async function sendToAIConsultant(msg) {
-        addChatMessage(msg, true);
-        chatInput.value = '';
-        
-        const loadingId = 'ai-load-' + Date.now();
-        addChatLoading(loadingId);
-
-        try {
-            const res = await fetch('/api/chat', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: msg })
-            });
-            const data = await res.json();
-            document.getElementById(loadingId).remove();
-            addChatMessage(data.reply, false);
-        } catch (e) {
-            document.getElementById(loadingId).remove();
-            addChatMessage("⚠️ Agronomist is offline. Check connection.", false);
-        }
-    }
-
-    function addChatMessage(text, isUser) {
-        const div = document.createElement('div');
-        div.className = isUser ? 'flex justify-end' : 'flex gap-3';
-        if (isUser) {
-            div.innerHTML = `<div class="bg-[#0d0d0d] text-white rounded-[16px] rounded-tr-[4px] px-4 py-3 max-w-[85%]"><p class="text-[14px]">${text}</p></div>`;
-        } else {
-            div.innerHTML = `
-                <div class="w-8 h-8 rounded-full bg-[#d4fae8] text-[#0fa76e] flex items-center justify-center shrink-0"><i data-lucide="bot" class="w-4 h-4"></i></div>
-                <div class="bg-[#f5f5f5] rounded-[16px] rounded-tl-[4px] px-4 py-3 max-w-[85%]"><p class="text-[14px] leading-relaxed text-[#333333]">${text}</p></div>
-            `;
-        }
-        chatMessages.appendChild(div);
-        lucide.createIcons();
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-    }
-
-    function addChatLoading(id) {
-        const div = document.createElement('div');
-        div.id = id; div.className = 'flex gap-3';
-        div.innerHTML = `
-            <div class="w-8 h-8 rounded-full bg-[#d4fae8] text-[#0fa76e] flex items-center justify-center shrink-0 animate-pulse"><i data-lucide="bot" class="w-4 h-4"></i></div>
-            <div class="bg-[#f5f5f5] rounded-[16px] rounded-tl-[4px] px-4 py-3"><p class="font-mono text-[10px] text-[#888888]">ANALYZING...</p></div>
-        `;
-        chatMessages.appendChild(div);
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-    }
-
-    fetchHistory();
-});
-</script>
+<button class="shrink-0 bg-near-black text-pure-white rounded-full px-6 py-3 font-body-base text-body-base font-medium hover:bg-gray-700 transition-colors shadow-[0_2px_8px_rgba(0,0,0,0.06)] flex items-center gap-2">
+<span class="material-symbols-outlined text-sm" data-icon="science">science</span>
+                Manual Analysis
+            </button>
+</div>
+<!-- Asymmetric Bento Grid Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+<!-- Left Column: Chronological Log (occupies 5 cols on lg) -->
+<div class="lg:col-span-5 flex flex-col gap-6">
+<div class="flex items-center justify-between mb-2">
+<h3 class="font-sub-heading text-sub-heading text-near-black">Growth History</h3>
+<button class="text-gray-500 hover:text-brand-green-deep transition-colors">
+<span class="material-symbols-outlined" data-icon="filter_list">filter_list</span>
+</button>
+</div>
+<!-- Log Entries List -->
+<div class="space-y-4 relative before:absolute before:inset-y-0 before:left-4 before:w-px before:bg-border-subtle">
+<!-- Entry 1 -->
+<div class="relative pl-12">
+<div class="absolute left-[13px] top-4 w-2 h-2 rounded-full bg-brand-green-deep z-10 ring-4 ring-pure-white"></div>
+<div class="bg-pure-white rounded-lg border border-border-subtle p-md shadow-[0_2px_8px_rgba(0,0,0,0.03)] hover:border-border-medium transition-colors">
+<div class="flex justify-between items-start mb-4">
+<span class="font-mono-code text-mono-code text-gray-500">Today, 09:00 AM</span>
+<span class="px-2 py-1 bg-surface-container-low rounded-full font-mono-code text-mono-code text-primary">Auto-Logged</span>
+</div>
+<div class="flex gap-4 mb-4">
+<div class="flex-1 bg-surface-container-lowest border border-border-subtle rounded-md p-3 text-center">
+<span class="block font-mono-code text-mono-code text-gray-500 mb-1">Height</span>
+<span class="font-card-title text-card-title text-near-black">12.5cm</span>
+</div>
+<div class="flex-1 bg-brand-green-light/30 border border-brand-green-light rounded-md p-3 text-center">
+<span class="block font-mono-code text-mono-code text-gray-500 mb-1">Health</span>
+<span class="font-card-title text-card-title text-brand-green-deep">98%</span>
+</div>
+</div>
+<div class="bg-gray-50 rounded-md p-4 border border-border-subtle">
+<div class="flex items-center gap-2 mb-2">
+<span class="material-symbols-outlined text-brand-green-deep text-sm" data-icon="psychiatry">psychiatry</span>
+<span class="font-label-uppercase text-label-uppercase text-near-black">AI Observation</span>
+</div>
+<p class="font-body-base text-body-base text-gray-700">Strong internodal development. Chlorophyll density in new leaves indicates optimal nutrient uptake. Maintain current EC levels.</p>
+</div>
+</div>
+</div>
+<!-- Entry 2 -->
+<div class="relative pl-12 opacity-80 hover:opacity-100 transition-opacity">
+<div class="absolute left-[13px] top-4 w-2 h-2 rounded-full bg-gray-300 z-10 ring-4 ring-pure-white"></div>
+<div class="bg-pure-white rounded-lg border border-border-subtle p-md shadow-[0_2px_8px_rgba(0,0,0,0.03)] hover:border-border-medium transition-colors">
+<div class="flex justify-between items-start mb-4">
+<span class="font-mono-code text-mono-code text-gray-500">Yesterday, 08:45 AM</span>
+<span class="px-2 py-1 bg-surface-container-low rounded-full font-mono-code text-mono-code text-primary">Auto-Logged</span>
+</div>
+<div class="flex gap-4 mb-4">
+<div class="flex-1 bg-surface-container-lowest border border-border-subtle rounded-md p-3 text-center">
+<span class="block font-mono-code text-mono-code text-gray-500 mb-1">Height</span>
+<span class="font-card-title text-card-title text-near-black">12.1cm</span>
+</div>
+<div class="flex-1 bg-surface-container-lowest border border-border-subtle rounded-md p-3 text-center">
+<span class="block font-mono-code text-mono-code text-gray-500 mb-1">Health</span>
+<span class="font-card-title text-card-title text-near-black">97%</span>
+</div>
+</div>
+<div class="bg-gray-50 rounded-md p-4 border border-border-subtle">
+<div class="flex items-center gap-2 mb-2">
+<span class="material-symbols-outlined text-brand-green-deep text-sm" data-icon="psychiatry">psychiatry</span>
+<span class="font-label-uppercase text-label-uppercase text-near-black">AI Observation</span>
+</div>
+<p class="font-body-base text-body-base text-gray-700">Minor tip burn detected on lower fan leaves. Likely slight potassium deficiency. Adjust fertigation mix slightly.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Column: AI Consultation Panel (occupies 7 cols on lg) -->
+<div class="lg:col-span-7 flex flex-col h-[800px]">
+<div class="bg-pure-white rounded-xl border border-border-subtle shadow-[0_2px_12px_rgba(0,0,0,0.04)] flex flex-col h-full overflow-hidden">
+<!-- Panel Header -->
+<div class="p-6 border-b border-border-subtle flex justify-between items-center bg-gray-50/50">
+<div class="flex items-center gap-3">
+<div class="h-10 w-10 rounded-full bg-brand-green-light flex items-center justify-center text-brand-green-deep">
+<span class="material-symbols-outlined" data-icon="smart_toy">smart_toy</span>
+</div>
+<div>
+<h3 class="font-card-title text-card-title text-near-black">Demeter Assistant</h3>
+<p class="font-mono-code text-mono-code text-gray-500">RAG Context: Monstera Profile + Recent Logs</p>
+</div>
+</div>
+<button class="text-gray-400 hover:text-near-black transition-colors">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</div>
+<!-- Chat Canvas -->
+<div class="flex-1 p-6 overflow-y-auto bg-surface-bright flex flex-col gap-6">
+<!-- AI Message -->
+<div class="flex gap-4 max-w-[85%]">
+<div class="h-8 w-8 rounded-full bg-brand-green-light flex items-center justify-center text-brand-green-deep shrink-0 mt-1">
+<span class="material-symbols-outlined text-sm" data-icon="smart_toy">smart_toy</span>
+</div>
+<div class="bg-pure-white border border-border-subtle rounded-2xl rounded-tl-sm p-4 shadow-[0_2px_4px_rgba(0,0,0,0.02)]">
+<p class="font-body-base text-body-base text-near-black">I've analyzed the recent growth logs. The internodal development is indeed strong. Considering the 12.5cm height and 98% health rating, the current environmental parameters are optimal. Do you want to review the exact DLI (Daily Light Integral) numbers or check soil moisture retention?</p>
+</div>
+</div>
+<!-- User Message -->
+<div class="flex gap-4 max-w-[85%] self-end flex-row-reverse">
+<div class="h-8 w-8 rounded-full bg-surface-container overflow-hidden shrink-0 mt-1">
+<img alt="User Avatar" class="h-full w-full object-cover" data-alt="close up professional headshot of a young woman with natural makeup, soft lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDskEsWAA9mUclVO1fqhl4qnjA2VU7BZlKRModvypfENYHcQHltazaWe_FopkrzKFjM0V36Qzgd6R5ULO91jw-LXnWQ3ThZHa5kO759sLI_uHwy9UuftxYIXiaAb3j_iB5m7pCFpZB4WJIs8QVsn3EiqRGv9O7Lz5Jc1pthx79cTdEbK3fGCm8df3rMKZL41O0qmtg955cj0Tdx2pX8mvKRKUcPS6BvkmfwC7md1XslYUEDZybzaKnBd24pX65xf1ZDU5V0yV0Q8uI"/>
+</div>
+<div class="bg-near-black text-pure-white rounded-2xl rounded-tr-sm p-4 shadow-[0_2px_4px_rgba(0,0,0,0.04)]">
+<p class="font-body-base text-body-base">Let's check the DLI numbers compared to last week. Did the recent overcast weather impact the greenhouse averages?</p>
+</div>
+</div>
+<!-- AI Context Card Message -->
+<div class="flex gap-4 max-w-[90%]">
+<div class="h-8 w-8 rounded-full bg-brand-green-light flex items-center justify-center text-brand-green-deep shrink-0 mt-1">
+<span class="material-symbols-outlined text-sm" data-icon="smart_toy">smart_toy</span>
+</div>
+<div class="bg-pure-white border border-border-subtle rounded-2xl rounded-tl-sm p-4 shadow-[0_2px_4px_rgba(0,0,0,0.02)] w-full">
+<p class="font-body-base text-body-base text-near-black mb-4">Yes, there was a slight dip. Here is the comparative data from the sensor arrays:</p>
+<div class="border border-border-subtle rounded-lg p-4 bg-gray-50 flex flex-col gap-3">
+<div class="flex justify-between items-center">
+<span class="font-mono-code text-mono-code text-gray-600">Current Week DLI Avg</span>
+<span class="font-body-base text-body-base font-semibold text-near-black">14.2 mol/m²/d</span>
+</div>
+<div class="h-px w-full bg-border-subtle"></div>
+<div class="flex justify-between items-center">
+<span class="font-mono-code text-mono-code text-gray-600">Previous Week DLI Avg</span>
+<span class="font-body-base text-body-base font-semibold text-near-black">16.8 mol/m²/d</span>
+</div>
+<div class="mt-2 text-sm text-warn-amber flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]" data-icon="warning">warning</span>
+<span>15.4% decrease. Supplemental lighting recommended if overcast conditions persist &gt; 48hrs.</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Input Area -->
+<div class="p-4 border-t border-border-subtle bg-pure-white">
+<div class="relative flex items-center">
+<input class="w-full bg-surface-container-lowest border border-border-medium rounded-full py-4 pl-6 pr-16 font-body-base text-body-base text-near-black placeholder:text-gray-400 focus:outline-none focus:border-brand-green-deep focus:ring-1 focus:ring-brand-green-deep transition-all" placeholder="Ask Demeter about health trends, pathogens, or parameters..." type="text"/>
+<button class="absolute right-2 h-10 w-10 bg-brand-green rounded-full flex items-center justify-center text-near-black hover:bg-brand-green-deep transition-colors">
+<span class="material-symbols-outlined" data-icon="arrow_upward">arrow_upward</span>
+</button>
+</div>
+<div class="flex gap-2 mt-3 px-2">
+<button class="px-3 py-1 border border-border-subtle rounded-full font-mono-code text-mono-code text-gray-500 hover:bg-gray-50 transition-colors">Generate Report</button>
+<button class="px-3 py-1 border border-border-subtle rounded-full font-mono-code text-mono-code text-gray-500 hover:bg-gray-50 transition-colors">Check Nutrients</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
 {% endblock %}

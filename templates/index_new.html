@@ -1,8 +1,5 @@
-{% extends "base.html" %}
-{% block title %}Demeter — Dashboard{% endblock %}
-{% block head_extra %}
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-{% endblock %}
+{% extends 'base.html' %}
+
 {% block content %}
 
 <div class="max-w-container-max mx-auto space-y-xl">
@@ -35,7 +32,7 @@
 <span class="material-symbols-outlined text-info-blue" data-icon="water_drop">water_drop</span>
 </div>
 <div class="flex items-end gap-3">
-<span class="font-section-heading text-section-heading text-near-black"><span id="moisture-val">42</span>%</span>
+<span class="font-section-heading text-section-heading text-near-black">42%</span>
 <span class="font-body-base text-body-base text-brand-green-deep mb-1">+2% from yesterday</span>
 </div>
 </div>
@@ -46,7 +43,7 @@
 <span class="material-symbols-outlined text-warn-amber" data-icon="thermostat">thermostat</span>
 </div>
 <div class="flex items-end gap-3">
-<span class="font-section-heading text-section-heading text-near-black"><span id="temp-val">24</span>°C</span>
+<span class="font-section-heading text-section-heading text-near-black"><span id='temp-val'>24</span>°C</span>
 <span class="font-body-base text-body-base text-gray-400 mb-1">Stable</span>
 </div>
 </div>
@@ -57,7 +54,7 @@
 <span class="material-symbols-outlined text-gray-400" data-icon="air">air</span>
 </div>
 <div class="flex items-end gap-3">
-<span class="font-section-heading text-section-heading text-near-black"><span id="co2-val">410</span><span class="text-card-title text-gray-400 ml-1">ppm</span></span>
+<span class="font-section-heading text-section-heading text-near-black">410<span class="text-card-title text-gray-400 ml-1">ppm</span></span>
 <span class="font-body-base text-body-base text-brand-green-deep mb-1">Optimal</span>
 </div>
 </div>

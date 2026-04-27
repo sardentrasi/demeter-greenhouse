@@ -1,131 +1,106 @@
-{% extends "base.html" %}
-
-{% block title %}Demeter — {{ sensor_config.title }}{% endblock %}
-
-{% block head_extra %}
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-{% endblock %}
-
+{% extends 'base.html' %}
 {% block content %}
-<!-- Header -->
-<div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-2">
-    <div>
-        <h1 class="text-[40px] md:text-[56px] font-display uppercase">{{ sensor_config.title }}</h1>
-        <p class="text-[14px] font-bold text-[#868685] uppercase tracking-wider mt-3">{{ sensor_config.subtitle }}</p>
-    </div>
-    <div class="flex gap-3">
-        <select id="time-range" class="form-control !rounded-full !py-2 !px-4 !text-[12px] !font-bold !uppercase !tracking-wider cursor-pointer">
-            <option value="24">Last 24 Hours</option>
-            <option value="48">Last 48 Hours</option>
-            <option value="168">Last 7 Days</option>
-        </select>
-    </div>
+<div class='p-lg w-full'>
+<div class="flex justify-between items-end mb-lg">
+<div>
+<h2 class="font-section-heading text-section-heading text-near-black mb-sm">Climatic Analysis</h2>
+<p class="font-body-large text-body-large text-gray-500">Real-time telemetry and historical data aggregation.</p>
 </div>
-
-<!-- Stat Cards -->
-<div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
-    <div class="bg-white rounded-[20px] p-5 shadow-[0_0_0_1px_rgba(14,15,12,0.12)]">
-        <p class="text-[10px] font-bold uppercase tracking-widest text-[#868685] mb-2">Current</p>
-        <p id="stat-current" class="text-[32px] font-display">--</p>
-    </div>
-    <div class="bg-white rounded-[20px] p-5 shadow-[0_0_0_1px_rgba(14,15,12,0.12)]">
-        <p class="text-[10px] font-bold uppercase tracking-widest text-[#868685] mb-2">Average</p>
-        <p id="stat-avg" class="text-[32px] font-display">--</p>
-    </div>
-    <div class="bg-[#e2f6d5] rounded-[20px] p-5 shadow-[0_0_0_1px_rgba(14,15,12,0.12)]">
-        <p class="text-[10px] font-bold uppercase tracking-widest text-[#868685] mb-2">Minimum</p>
-        <p id="stat-min" class="text-[32px] font-display">--</p>
-    </div>
-    <div class="bg-white rounded-[20px] p-5 shadow-[0_0_0_1px_rgba(14,15,12,0.12)]">
-        <p class="text-[10px] font-bold uppercase tracking-widest text-[#868685] mb-2">Maximum</p>
-        <p id="stat-max" class="text-[32px] font-display">--</p>
-    </div>
+<div class="flex gap-xs bg-pure-white p-xs rounded-full border border-border-subtle shadow-[0_2px_8px_rgba(0,0,0,0.03)]">
+<button class="px-md py-sm rounded-full font-label-uppercase text-label-uppercase text-gray-500 hover:text-near-black transition-colors">24H</button>
+<button class="px-md py-sm rounded-full bg-near-black text-pure-white font-label-uppercase text-label-uppercase shadow-[0_2px_8px_rgba(0,0,0,0.06)]">7D</button>
+<button class="px-md py-sm rounded-full font-label-uppercase text-label-uppercase text-gray-500 hover:text-near-black transition-colors">30D</button>
 </div>
-
-<!-- Chart -->
-<div class="bg-white rounded-[30px] p-6 md:p-8 shadow-[0_0_0_1px_rgba(14,15,12,0.12)] mb-6">
-    <div class="h-[350px] md:h-[400px]">
-        <canvas id="climatic-chart"></canvas>
-    </div>
 </div>
-
-<!-- Recent Readings Table -->
-<div class="bg-white rounded-[30px] p-6 md:p-8 shadow-[0_0_0_1px_rgba(14,15,12,0.12)]">
-    <h2 class="text-[28px] font-display uppercase mb-6">Recent Readings</h2>
-    <div class="max-h-[300px] overflow-y-auto custom-scroll">
-        <table class="w-full">
-            <thead>
-                <tr class="border-b border-[#e8ebe6]">
-                    <th class="text-left py-3 px-2 text-[11px] font-bold uppercase tracking-wider text-[#868685]">Timestamp</th>
-                    <th class="text-left py-3 px-2 text-[11px] font-bold uppercase tracking-wider text-[#868685]">Value</th>
-                </tr>
-            </thead>
-            <tbody id="readings-tbody"></tbody>
-        </table>
-    </div>
+<!-- Dashboard Grid -->
+<div class="grid grid-cols-1 gap-md">
+<!-- Temperature Card -->
+<div class="bg-pure-white rounded-DEFAULT border border-border-subtle p-md shadow-[0_2px_8px_rgba(0,0,0,0.03)] hover:border-medium transition-colors">
+<div class="flex justify-between items-start mb-md">
+<div>
+<h3 class="font-card-title text-card-title text-near-black flex items-center gap-sm">
+<span class="material-symbols-outlined text-gray-400" data-icon="thermostat">thermostat</span>
+                                Ambient Temperature
+                            </h3>
+<div class="flex gap-md mt-sm">
+<div>
+<span class="font-mono-code text-mono-code text-gray-400 block mb-xs">MIN</span>
+<span class="font-sub-heading text-sub-heading text-near-black">18.2°C</span>
 </div>
-{% endblock %}
-
-{% block scripts %}
-<script>
-const SENSOR_TYPE = "{{ sensor_type }}";
-const SENSOR_UNIT = "{{ sensor_config.unit }}";
-const SENSOR_COLOR = "{{ sensor_config.color }}";
-
-document.addEventListener('DOMContentLoaded', () => {
-    const ctx = document.getElementById('climatic-chart');
-    const chart = new Chart(ctx, {
-        type: 'line',
-        data: { labels: [], datasets: [{
-            label: '{{ sensor_config.title }}',
-            data: [],
-            borderColor: SENSOR_COLOR,
-            backgroundColor: SENSOR_COLOR + '20',
-            fill: true, tension: 0.4, borderWidth: 3,
-            pointRadius: 2, pointHoverRadius: 6,
-            pointHoverBackgroundColor: SENSOR_COLOR,
-            pointHoverBorderColor: '#fff', pointHoverBorderWidth: 2
-        }]},
-        options: {
-            responsive: true, maintainAspectRatio: false,
-            plugins: { legend: { display: false },
-                tooltip: { backgroundColor: '#fff', titleColor: '#0e0f0c', bodyColor: '#0e0f0c',
-                    borderColor: 'rgba(14,15,12,0.08)', borderWidth: 1, cornerRadius: 16, padding: 14,
-                    titleFont: { weight: '900', size: 11 }, bodyFont: { weight: '700', size: 11 } }
-            },
-            scales: {
-                x: { grid: { color: '#e8ebe6' }, ticks: { color: '#868685', font: { weight: '700', size: 10 }, maxTicksLimit: 20 } },
-                y: { grid: { color: '#e8ebe6' }, ticks: { color: '#868685', font: { weight: '700', size: 11 } } }
-            }
-        }
-    });
-
-    async function fetchData() {
-        const hours = document.getElementById('time-range').value;
-        try {
-            const res = await fetch(`/api/climatic/${SENSOR_TYPE}?hours=${hours}`);
-            const data = await res.json();
-
-            chart.data.labels = data.timeseries.map(r => r.time);
-            chart.data.datasets[0].data = data.timeseries.map(r => r.value);
-            chart.update();
-
-            document.getElementById('stat-current').textContent = data.stats.current + SENSOR_UNIT;
-            document.getElementById('stat-avg').textContent = data.stats.avg + SENSOR_UNIT;
-            document.getElementById('stat-min').textContent = data.stats.min + SENSOR_UNIT;
-            document.getElementById('stat-max').textContent = data.stats.max + SENSOR_UNIT;
-
-            const tbody = document.getElementById('readings-tbody');
-            tbody.innerHTML = '';
-            data.timeseries.slice(-30).reverse().forEach(r => {
-                tbody.innerHTML += `<tr class="border-b border-[#e8ebe6]/50"><td class="py-2 px-2 text-[13px] font-semibold text-[#868685]">${r.time}</td><td class="py-2 px-2 text-[14px] font-bold">${r.value}${SENSOR_UNIT}</td></tr>`;
-            });
-        } catch(e) { console.error('Climatic fetch error:', e); }
-    }
-
-    fetchData();
-    document.getElementById('time-range').addEventListener('change', fetchData);
-    setInterval(fetchData, 30000);
-});
-</script>
+<div>
+<span class="font-mono-code text-mono-code text-gray-400 block mb-xs">MAX</span>
+<span class="font-sub-heading text-sub-heading text-near-black">24.5°C</span>
+</div>
+<div>
+<span class="font-mono-code text-mono-code text-brand-green-deep block mb-xs">AVG</span>
+<span class="font-sub-heading text-sub-heading text-brand-green-deep">21.8°C</span>
+</div>
+</div>
+</div>
+<span class="bg-brand-green-light text-brand-green-deep px-sm py-xs rounded-full font-mono-code text-mono-code">OPTIMAL</span>
+</div>
+<div class="h-64 w-full bg-gray-50 rounded-sm border border-border-subtle flex items-center justify-center">
+<span class="font-mono-code text-mono-code text-gray-400">Chart.js Instance - Temperature</span>
+</div>
+</div>
+<!-- Humidity Card -->
+<div class="bg-pure-white rounded-DEFAULT border border-border-subtle p-md shadow-[0_2px_8px_rgba(0,0,0,0.03)] hover:border-medium transition-colors">
+<div class="flex justify-between items-start mb-md">
+<div>
+<h3 class="font-card-title text-card-title text-near-black flex items-center gap-sm">
+<span class="material-symbols-outlined text-info-blue" data-icon="water_drop">water_drop</span>
+                                Relative Humidity
+                            </h3>
+<div class="flex gap-md mt-sm">
+<div>
+<span class="font-mono-code text-mono-code text-gray-400 block mb-xs">MIN</span>
+<span class="font-sub-heading text-sub-heading text-near-black">45%</span>
+</div>
+<div>
+<span class="font-mono-code text-mono-code text-gray-400 block mb-xs">MAX</span>
+<span class="font-sub-heading text-sub-heading text-near-black">62%</span>
+</div>
+<div>
+<span class="font-mono-code text-mono-code text-info-blue block mb-xs">AVG</span>
+<span class="font-sub-heading text-sub-heading text-info-blue">54%</span>
+</div>
+</div>
+</div>
+<span class="bg-gray-100 text-gray-600 px-sm py-xs rounded-full font-mono-code text-mono-code">STABLE</span>
+</div>
+<div class="h-64 w-full bg-gray-50 rounded-sm border border-border-subtle flex items-center justify-center">
+<span class="font-mono-code text-mono-code text-gray-400">Chart.js Instance - Humidity</span>
+</div>
+</div>
+<!-- CO2 Card -->
+<div class="bg-pure-white rounded-DEFAULT border border-border-subtle p-md shadow-[0_2px_8px_rgba(0,0,0,0.03)] hover:border-medium transition-colors">
+<div class="flex justify-between items-start mb-md">
+<div>
+<h3 class="font-card-title text-card-title text-near-black flex items-center gap-sm">
+<span class="material-symbols-outlined text-warn-amber" data-icon="co2">co2</span>
+                                CO2 Concentration
+                            </h3>
+<div class="flex gap-md mt-sm">
+<div>
+<span class="font-mono-code text-mono-code text-gray-400 block mb-xs">MIN</span>
+<span class="font-sub-heading text-sub-heading text-near-black">380 ppm</span>
+</div>
+<div>
+<span class="font-mono-code text-mono-code text-gray-400 block mb-xs">MAX</span>
+<span class="font-sub-heading text-sub-heading text-near-black">450 ppm</span>
+</div>
+<div>
+<span class="font-mono-code text-mono-code text-warn-amber block mb-xs">AVG</span>
+<span class="font-sub-heading text-sub-heading text-warn-amber">412 ppm</span>
+</div>
+</div>
+</div>
+<span class="bg-amber-50 text-warn-amber px-sm py-xs rounded-full font-mono-code text-mono-code border border-amber-200">ELEVATED</span>
+</div>
+<div class="h-64 w-full bg-gray-50 rounded-sm border border-border-subtle flex items-center justify-center">
+<span class="font-mono-code text-mono-code text-gray-400">Chart.js Instance - CO2</span>
+</div>
+</div>
+</div>
+</div>
 {% endblock %}

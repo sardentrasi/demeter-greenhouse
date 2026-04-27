@@ -119,7 +119,7 @@ document.addEventListener('DOMContentLoaded', () => {
             sidebar.classList.add('minimized');
         }
 
-        sidebarToggle.addEventListener('click', () => {
+        if(sidebarToggle) sidebarToggle.addEventListener('click', () => {
             if (window.innerWidth >= 768) {
                 // Desktop minimize
                 sidebar.classList.toggle('minimized');
@@ -138,21 +138,21 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (mobileToggle) {
-        mobileToggle.addEventListener('click', () => {
+        if(mobileToggle) mobileToggle.addEventListener('click', () => {
             sidebar.classList.add('mobile-open');
             backdrop.classList.add('show');
         });
     }
 
     if (backdrop) {
-        backdrop.addEventListener('click', () => {
+        if(backdrop) backdrop.addEventListener('click', () => {
             sidebar.classList.remove('mobile-open');
             backdrop.classList.remove('show');
         });
     }
 
     if (climaticToggle) {
-        climaticToggle.addEventListener('click', (e) => {
+        if(climaticToggle) climaticToggle.addEventListener('click', (e) => {
             e.preventDefault();
             // Don't open submenu if minimized
             if (sidebar.classList.contains('minimized')) {
@@ -188,6 +188,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Close when clicking outside
         document.addEventListener('click', (e) => {
+    if(notifDropdown && notifToggle) {
+        if (!notifDropdown.contains(e.target) && !notifToggle.contains(e.target)) {
+            notifDropdown.classList.remove('show');
+        }
+    }
             if (!notifBtn.contains(e.target) && !notifDropdown.contains(e.target)) {
                 notifDropdown.classList.remove('show');
             }
@@ -236,20 +241,20 @@ document.addEventListener('DOMContentLoaded', () => {
             
             if (data.last_seen) {
                 const dt = new Date(data.last_seen);
-                lastSeenTime.textContent = `${dt.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}, ${dt.toLocaleDateString('en-US', {month:'short', day:'numeric'})}`;
+                if(lastSeenTime) lastSeenTime.textContent = `${dt.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}, ${dt.toLocaleDateString('en-US', {month:'short', day:'numeric'})}`;
                 
                 // Sensor Connection Logic (within 60s is Online)
                 const diffSec = (new Date() - dt) / 1000;
                 if (diffSec < 65) {
-                    systemBadge.textContent = "SENSOR ONLINE";
-                    systemBadge.parentElement.className = "flex items-center gap-2 px-3 py-1.5 bg-[#d4fae8] rounded-full border border-[#18E299]/30";
-                    systemBadge.previousElementSibling.setAttribute('data-lucide', 'check-circle-2');
-                    systemBadge.previousElementSibling.className = "w-4 h-4 text-[#0fa76e]";
+                    if(systemBadge) systemBadge.textContent = "SENSOR ONLINE";
+                    if(systemBadge) systemBadge.parentElement.className = "flex items-center gap-2 px-3 py-1.5 bg-[#d4fae8] rounded-full border border-[#18E299]/30";
+                    if(systemBadge) systemBadge.previousElementSibling.setAttribute('data-lucide', 'check-circle-2');
+                    if(systemBadge) systemBadge.previousElementSibling.className = "w-4 h-4 text-[#0fa76e]";
                 } else {
-                    systemBadge.textContent = "SENSOR OFFLINE";
-                    systemBadge.parentElement.className = "flex items-center gap-2 px-3 py-1.5 bg-[#fde8e8] rounded-full border border-[#d45656]/30";
-                    systemBadge.previousElementSibling.setAttribute('data-lucide', 'alert-circle');
-                    systemBadge.previousElementSibling.className = "w-4 h-4 text-[#d45656]";
+                    if(systemBadge) systemBadge.textContent = "SENSOR OFFLINE";
+                    if(systemBadge) systemBadge.parentElement.className = "flex items-center gap-2 px-3 py-1.5 bg-[#fde8e8] rounded-full border border-[#d45656]/30";
+                    if(systemBadge) systemBadge.previousElementSibling.setAttribute('data-lucide', 'alert-circle');
+                    if(systemBadge) systemBadge.previousElementSibling.className = "w-4 h-4 text-[#d45656]";
                 }
                 if (typeof lucide !== 'undefined') lucide.createIcons();
             }
@@ -260,10 +265,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (data.latest_image) {
                     latestCapture.src = `/vision_capture/${data.latest_image}?t=${Date.now()}`;
                     latestCapture.style.display = 'block';
-                    noImage.style.display = 'none';
+                    if(noImage) noImage.style.display = 'none';
                 } else {
                     latestCapture.style.display = 'none';
-                    noImage.style.display = 'flex';
+                    if(noImage) noImage.style.display = 'flex';
                 }
             }
         } catch (e) {}
@@ -306,7 +311,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ===== DASHBOARD BUTTONS =====
     if (btnForceScan) {
-        btnForceScan.addEventListener('click', async () => {
+        if(btnForceScan) btnForceScan.addEventListener('click', async () => {
             if (!confirm('Trigger a manual visual scan + AI analysis?')) return;
             const res = await fetch('/api/controls/scan', { method: 'POST' });
             const data = await res.json();
@@ -315,7 +320,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (btnForceWater) {
-        btnForceWater.addEventListener('click', async () => {
+        if(btnForceWater) btnForceWater.addEventListener('click', async () => {
             if (!confirm('⚠️ This will activate the water pump! Are you sure?')) return;
             const res = await fetch('/api/controls/water', { method: 'POST' });
             const data = await res.json();

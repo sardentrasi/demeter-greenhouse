@@ -3,13 +3,12 @@
 <html lang="en"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>{% block title %}Demeter AI - Dashboard{% endblock %}</title>
-    {% block head_extra %}{% endblock %}
+<title>{% block title %}Demeter AI - Agronomist Dashboard{% endblock %}</title>
+{% block head_extra %}{% endblock %}
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Geist+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<script src="https://unpkg.com/lucide@latest"></script>
 <script id="tailwind-config">
         tailwind.config = {
             darkMode: "class",
@@ -208,30 +207,25 @@
 </div>
 </div>
 <!-- Primary Navigation -->
-
 <nav class="space-y-sm">
 <!-- Active Item: Overview -->
-<a class="{% if active_page == 'dashboard' %}bg-brand-green/10 text-brand-green-deep{% else %}text-gray-500 hover:text-near-black hover:bg-gray-50{% endif %} rounded-full px-4 py-2 flex items-center gap-3 transition-all duration-200 active:scale-[0.98]" href="/">
-<span class="material-symbols-outlined" data-icon="dashboard" {% if active_page == 'dashboard' %}data-weight="fill" style="font-variation-settings: 'FILL' 1;"{% endif %}>dashboard</span>
+<a class="bg-brand-green/10 text-brand-green-deep rounded-full px-4 py-2 flex items-center gap-3 transition-all duration-200 active:scale-[0.98]" href="{{ url_for('html_dashboard') }}">
+<span class="material-symbols-outlined" data-icon="dashboard" data-weight="fill" style="font-variation-settings: 'FILL' 1;">dashboard</span>
 <span class="font-label-uppercase text-label-uppercase">Overview</span>
 </a>
-<!-- Active Item: Growth Log -->
-<a class="{% if active_page == 'growth_log' %}bg-brand-green/10 text-brand-green-deep{% else %}text-gray-500 hover:text-near-black hover:bg-gray-50{% endif %} rounded-full px-4 py-2 flex items-center gap-3 transition-all duration-200 active:scale-[0.98]" href="/growth-log">
-<span class="material-symbols-outlined" data-icon="potted_plant" {% if active_page == 'growth_log' %}data-weight="fill" style="font-variation-settings: 'FILL' 1;"{% endif %}>potted_plant</span>
+<a class="text-gray-500 hover:text-near-black hover:bg-gray-50 rounded-full px-4 py-2 flex items-center gap-3 transition-all duration-200 active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined" data-icon="potted_plant">potted_plant</span>
 <span class="font-label-uppercase text-label-uppercase">Growth Log</span>
 </a>
-<!-- Active Item: Climatic Analysis -->
-<a class="{% if active_page and active_page.startswith('climatic') %}bg-brand-green/10 text-brand-green-deep{% else %}text-gray-500 hover:text-near-black hover:bg-gray-50{% endif %} rounded-full px-4 py-2 flex items-center gap-3 transition-all duration-200 active:scale-[0.98]" href="/climatic/temperature">
-<span class="material-symbols-outlined" data-icon="monitoring" {% if active_page and active_page.startswith('climatic') %}data-weight="fill" style="font-variation-settings: 'FILL' 1;"{% endif %}>monitoring</span>
+<a class="text-gray-500 hover:text-near-black hover:bg-gray-50 rounded-full px-4 py-2 flex items-center gap-3 transition-all duration-200 active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined" data-icon="monitoring">monitoring</span>
 <span class="font-label-uppercase text-label-uppercase">Climatic Analysis</span>
 </a>
-<!-- Active Item: Control Center -->
-<a class="{% if active_page == 'controls' %}bg-brand-green/10 text-brand-green-deep{% else %}text-gray-500 hover:text-near-black hover:bg-gray-50{% endif %} rounded-full px-4 py-2 flex items-center gap-3 transition-all duration-200 active:scale-[0.98]" href="/controls">
-<span class="material-symbols-outlined" data-icon="settings_remote" {% if active_page == 'controls' %}data-weight="fill" style="font-variation-settings: 'FILL' 1;"{% endif %}>settings_remote</span>
+<a class="text-gray-500 hover:text-near-black hover:bg-gray-50 rounded-full px-4 py-2 flex items-center gap-3 transition-all duration-200 active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined" data-icon="settings_remote">settings_remote</span>
 <span class="font-label-uppercase text-label-uppercase">Control Center</span>
 </a>
 </nav>
-
 </div>
 <div>
 <!-- CTA Area -->
@@ -242,22 +236,16 @@
                 </button>
 </div>
 <!-- Footer Navigation -->
-
 <nav class="space-y-xs pt-4 border-t border-border-subtle">
-<a class="text-gray-500 hover:text-near-black hover:bg-gray-50 rounded-full px-4 py-2 flex items-center gap-3 transition-all duration-200" href="/reports">
+<a class="text-gray-500 hover:text-near-black hover:bg-gray-50 rounded-full px-4 py-2 flex items-center gap-3 transition-all duration-200" href="#">
 <span class="material-symbols-outlined text-sm" data-icon="description">description</span>
-<span class="font-mono-code text-mono-code">Reports</span>
+<span class="font-mono-code text-mono-code">Documentation</span>
 </a>
-<a class="{% if active_page == 'settings' %}bg-brand-green/10 text-brand-green-deep{% else %}text-gray-500 hover:text-near-black hover:bg-gray-50{% endif %} rounded-full px-4 py-2 flex items-center gap-3 transition-all duration-200" href="/settings">
-<span class="material-symbols-outlined text-sm" data-icon="settings" {% if active_page == 'settings' %}data-weight="fill" style="font-variation-settings: 'FILL' 1;"{% endif %}>settings</span>
+<a class="text-gray-500 hover:text-near-black hover:bg-gray-50 rounded-full px-4 py-2 flex items-center gap-3 transition-all duration-200" href="#">
+<span class="material-symbols-outlined text-sm" data-icon="settings">settings</span>
 <span class="font-mono-code text-mono-code">Settings</span>
 </a>
-<a class="text-gray-500 hover:text-error-red hover:bg-error-container rounded-full px-4 py-2 flex items-center gap-3 transition-all duration-200" href="/logout">
-<span class="material-symbols-outlined text-sm" data-icon="logout">logout</span>
-<span class="font-mono-code text-mono-code">Logout</span>
-</a>
 </nav>
-
 </div>
 </aside>
 <!-- Main Content Area -->
@@ -285,11 +273,9 @@
 </div>
 </div>
 </header>
-<!-- Canvas -->
-<div class="flex-1 p-lg overflow-y-auto">
-{% block content %}{% endblock %}
 
+<div class="flex-1 p-lg overflow-y-auto w-full custom-scroll">
+{% block content %}{% endblock %}
 </div>
 </main>
-<script src="/static/js/app.js"></script>
 </body></html>
