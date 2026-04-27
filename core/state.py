@@ -67,6 +67,7 @@ DB_FILE = os.getenv("DB_FILE", "data_logs/garden_history.csv")
 DB_PATH = os.getenv("DB_PATH", "data_logs/demeter.db")
 CAPTURE_DIR = os.getenv("CAPTURE_DIR", "vision_capture")
 MOISTURE_SAFETY_LIMIT = int(os.getenv("MOISTURE_SAFETY_LIMIT", 70))
+PLANT_NAME = os.getenv("PLANT_NAME", "Monstera Deliciosa Variegata")
 
 # GLOBAL VARIABLES
 LATEST_DATA = {

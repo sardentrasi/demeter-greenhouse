@@ -7,6 +7,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const lastSeenTime = document.getElementById('last-seen-time');
     const systemBadge = document.getElementById('system-status-badge');
     const actionBadge = document.getElementById('action-badge');
+    const esp32Badge = document.getElementById('esp32-connection-badge');
+    const esp32Dot = document.getElementById('esp32-connection-dot');
+    const esp32Text = document.getElementById('esp32-connection-text');
     
     // DOM Elements - Images
     const latestCapture = document.getElementById('latest-capture');
@@ -43,7 +46,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // DOM Elements - Dashboard Controls
     const btnForceScan = document.getElementById('btn-force-scan');
+    const btnSidebarForceScan = document.getElementById('btn-sidebar-force-scan');
     const btnForceWater = document.getElementById('btn-force-water');
+    const btnControlForceWater = document.getElementById('btn-control-force-water');
+    const btnControlResetCooldown = document.getElementById('btn-control-reset-cooldown');
+    const btnControlVisionScan = document.getElementById('btn-control-vision-scan');
+
+    // DOM Elements - Latest Insight Card
+    const latestInsightImage = document.getElementById('latest-insight-image');
+    const latestInsightSource = document.getElementById('latest-insight-source');
+    const latestInsightTitle = document.getElementById('latest-insight-title');
+    const latestInsightNotes = document.getElementById('latest-insight-notes');
+    const latestInsightTime = document.getElementById('latest-insight-time');
+    const latestInsightLink = document.getElementById('latest-insight-link');
 
     // ===== CHART SETUP (Only if on Dashboard) =====
     const ctx = document.getElementById('sensor-chart');
@@ -188,11 +203,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Close when clicking outside
         document.addEventListener('click', (e) => {
-    if(notifDropdown && notifToggle) {
-        if (!notifDropdown.contains(e.target) && !notifToggle.contains(e.target)) {
-            notifDropdown.classList.remove('show');
-        }
-    }
             if (!notifBtn.contains(e.target) && !notifDropdown.contains(e.target)) {
                 notifDropdown.classList.remove('show');
             }
@@ -209,14 +219,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 notifCount.classList.remove('hidden');
                 
                 notifList.innerHTML = '';
+                const iconMap = { irrigation: '💦', control: '⚙️', growth: '🌱' };
                 data.forEach(n => {
-                    const icon = n.type === 'irrigation' ? '💦' : '⚙️';
+                    const icon = iconMap[n.type] || '🔔';
                     const item = document.createElement('div');
                     item.className = 'notif-item p-3 border-b border-[#e8ebe6] flex gap-3 cursor-pointer';
                     item.innerHTML = `
                         <div class="w-8 h-8 rounded-full bg-[#e8ebe6] flex items-center justify-center shrink-0 text-sm">${icon}</div>
-                        <div>
-                            <p class="text-[12px] font-bold text-[#0e0f0c]">${n.message}</p>
+                        <div class="min-w-0">
+                            <p class="text-[12px] font-bold text-[#0e0f0c] truncate">${n.message}</p>
                             <p class="text-[10px] font-semibold text-[#868685] uppercase mt-1">${n.timestamp}</p>
                         </div>
                     `;
@@ -224,11 +235,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             } else {
                 notifCount.classList.add('hidden');
+                notifList.innerHTML = '<p class="text-center py-6 text-[12px] font-bold text-gray-400 uppercase tracking-wider">No notifications</p>';
             }
         } catch(e) {}
     }
 
     // ===== STATUS POLLING =====
+    function timeAgo(date) {
+        const seconds = Math.floor((new Date() - date) / 1000);
+        if (seconds < 5) return 'just now';
+        if (seconds < 60) return seconds + ' seconds ago';
+        const minutes = Math.floor(seconds / 60);
+        if (minutes < 60) return minutes + 'm ago';
+        const hours = Math.floor(minutes / 60);
+        if (hours < 24) return hours + 'h ago';
+        return date.toLocaleDateString();
+    }
+
     async function fetchStatus() {
         try {
             const res = await fetch('/api/status');
@@ -238,24 +261,57 @@ document.addEventListener('DOMContentLoaded', () => {
             if (tempVal) tempVal.textContent = data.temp;
             if (humidityVal) humidityVal.textContent = data.humidity;
             if (co2Val) co2Val.textContent = data.co2;
+
+            // Dashboard Overview specific updates
+            const gardenStatusTitle = document.getElementById('garden-status-title');
+            const gardenStatusDesc = document.getElementById('garden-status-desc');
+            const lastSeenText = document.getElementById('last-seen-text');
+            const moistureStatus = document.getElementById('moisture-status');
+            const tempStatus = document.getElementById('temp-status');
+            const humidityStatus = document.getElementById('humidity-status');
+            const co2Status = document.getElementById('co2-status');
             
             if (data.last_seen) {
                 const dt = new Date(data.last_seen);
                 if(lastSeenTime) lastSeenTime.textContent = `${dt.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}, ${dt.toLocaleDateString('en-US', {month:'short', day:'numeric'})}`;
+                if(lastSeenText) lastSeenText.textContent = timeAgo(dt);
                 
                 // Sensor Connection Logic (within 60s is Online)
                 const diffSec = (new Date() - dt) / 1000;
-                if (diffSec < 65) {
+                const isOnline = diffSec < 65;
+
+                if (isOnline) {
                     if(systemBadge) systemBadge.textContent = "SENSOR ONLINE";
                     if(systemBadge) systemBadge.parentElement.className = "flex items-center gap-2 px-3 py-1.5 bg-[#d4fae8] rounded-full border border-[#18E299]/30";
                     if(systemBadge) systemBadge.previousElementSibling.setAttribute('data-lucide', 'check-circle-2');
                     if(systemBadge) systemBadge.previousElementSibling.className = "w-4 h-4 text-[#0fa76e]";
+                    if(esp32Badge) esp32Badge.className = "inline-flex items-center gap-2 rounded-full px-4 py-1.5 bg-[#d4fae8] border border-[#18E299]/30";
+                    if(esp32Dot) esp32Dot.className = "w-2 h-2 rounded-full bg-[#0fa76e]";
+                    if(esp32Text) esp32Text.textContent = "ESP32: Online";
+                    if(esp32Text) esp32Text.className = "font-label-uppercase text-label-uppercase text-[#0fa76e]";
+                    
+                    if(gardenStatusTitle) gardenStatusTitle.textContent = "Garden Status: OPTIMAL";
+                    if(gardenStatusDesc) gardenStatusDesc.textContent = `Telemetry is stable. Moisture at ${data.moisture}% is healthy.`;
                 } else {
                     if(systemBadge) systemBadge.textContent = "SENSOR OFFLINE";
                     if(systemBadge) systemBadge.parentElement.className = "flex items-center gap-2 px-3 py-1.5 bg-[#fde8e8] rounded-full border border-[#d45656]/30";
                     if(systemBadge) systemBadge.previousElementSibling.setAttribute('data-lucide', 'alert-circle');
                     if(systemBadge) systemBadge.previousElementSibling.className = "w-4 h-4 text-[#d45656]";
+                    if(esp32Badge) esp32Badge.className = "inline-flex items-center gap-2 rounded-full px-4 py-1.5 bg-[#fde8e8] border border-[#d45656]/30";
+                    if(esp32Dot) esp32Dot.className = "w-2 h-2 rounded-full bg-[#d45656]";
+                    if(esp32Text) esp32Text.textContent = "ESP32: Offline";
+                    if(esp32Text) esp32Text.className = "font-label-uppercase text-label-uppercase text-[#d45656]";
+
+                    if(gardenStatusTitle) gardenStatusTitle.textContent = "Garden Status: UNKNOWN";
+                    if(gardenStatusDesc) gardenStatusDesc.textContent = "Check ESP32 connection. No data received recently.";
                 }
+                
+                // Update metrics sub-labels
+                if(moistureStatus) moistureStatus.textContent = data.moisture < 30 ? 'Low' : (data.moisture > 80 ? 'High' : 'Optimal');
+                if(tempStatus) tempStatus.textContent = data.temp > 30 ? 'Warm' : (data.temp < 15 ? 'Cool' : 'Stable');
+                if(humidityStatus) humidityStatus.textContent = data.humidity < 40 ? 'Dry' : (data.humidity > 70 ? 'High' : 'Optimal');
+                if(co2Status) co2Status.textContent = data.co2 > 1000 ? 'High' : 'Normal';
+
                 if (typeof lucide !== 'undefined') lucide.createIcons();
             }
 
@@ -271,7 +327,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     if(noImage) noImage.style.display = 'flex';
                 }
             }
-        } catch (e) {}
+        } catch (e) {
+            if(esp32Badge) esp32Badge.className = "inline-flex items-center gap-2 rounded-full px-4 py-1.5 bg-[#fde8e8] border border-[#d45656]/30";
+            if(esp32Dot) esp32Dot.className = "w-2 h-2 rounded-full bg-[#d45656]";
+            if(esp32Text) esp32Text.textContent = "ESP32: Offline";
+            if(esp32Text) esp32Text.className = "font-label-uppercase text-label-uppercase text-[#d45656]";
+        }
     }
 
     async function fetchHistory() {
@@ -309,22 +370,72 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (e) {}
     }
 
-    // ===== DASHBOARD BUTTONS =====
-    if (btnForceScan) {
-        if(btnForceScan) btnForceScan.addEventListener('click', async () => {
-            if (!confirm('Trigger a manual visual scan + AI analysis?')) return;
-            const res = await fetch('/api/controls/scan', { method: 'POST' });
+    async function fetchLatestInsight() {
+        if (!latestInsightTitle || !latestInsightNotes) return;
+        try {
+            const res = await fetch('/api/insights/latest');
+            if (!res.ok) throw new Error('Insight API error');
             const data = await res.json();
-            alert(data.message);
-        });
+
+            if (latestInsightSource) latestInsightSource.textContent = 'Vision AI';
+            if (latestInsightTitle) latestInsightTitle.textContent = data.title || 'No insight yet';
+            if (latestInsightNotes) latestInsightNotes.textContent = data.notes || 'Belum ada catatan insight terbaru.';
+            if (latestInsightTime) {
+                latestInsightTime.textContent = data.timestamp ? `Logged at ${data.timestamp}` : 'No insight record yet';
+            }
+            if (latestInsightLink && data.link) latestInsightLink.href = data.link;
+
+            if (latestInsightImage && data.image_url) {
+                latestInsightImage.src = `${data.image_url}?t=${Date.now()}`;
+            }
+        } catch (e) {
+            if (latestInsightTime) latestInsightTime.textContent = 'Insight unavailable right now.';
+        }
+    }
+
+    // ===== DASHBOARD BUTTONS =====
+    async function postControlAction(endpoint, confirmMessage) {
+        if (confirmMessage && !confirm(confirmMessage)) return;
+        try {
+            const res = await fetch(endpoint, { method: 'POST' });
+            const data = await res.json();
+            alert(data.message || (data.success ? 'Command sent.' : 'Command failed.'));
+        } catch (e) {
+            alert('Failed to send command. Please try again.');
+        }
+    }
+
+    async function handleForceScanClick() {
+        await postControlAction('/api/controls/scan', 'Trigger a manual visual scan + AI analysis?');
+    }
+
+    if (btnForceScan) {
+        btnForceScan.addEventListener('click', handleForceScanClick);
+    }
+
+    if (btnSidebarForceScan) {
+        btnSidebarForceScan.addEventListener('click', handleForceScanClick);
     }
 
     if (btnForceWater) {
-        if(btnForceWater) btnForceWater.addEventListener('click', async () => {
-            if (!confirm('⚠️ This will activate the water pump! Are you sure?')) return;
-            const res = await fetch('/api/controls/water', { method: 'POST' });
-            const data = await res.json();
-            alert(data.message);
+        btnForceWater.addEventListener('click', async () => {
+            await postControlAction('/api/controls/water', '⚠️ This will activate the water pump! Are you sure?');
+        });
+    }
+
+    if (btnControlVisionScan) {
+        btnControlVisionScan.addEventListener('click', handleForceScanClick);
+    }
+
+    if (btnControlForceWater) {
+        btnControlForceWater.addEventListener('click', async () => {
+            await postControlAction('/api/controls/water', '⚠️ Force pump for this cycle?');
+        });
+    }
+
+    if (btnControlResetCooldown) {
+        btnControlResetCooldown.addEventListener('click', async () => {
+            await postControlAction('/api/controls/reset-cooldown', 'Reset cooldown timer now?');
         });
     }
 
@@ -332,9 +443,11 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchStatus();
     fetchHistory();
     fetchNotifications();
+    fetchLatestInsight();
     
     // Polling
     setInterval(fetchStatus, 5000);
     setInterval(fetchHistory, 15000);
     setInterval(fetchNotifications, 30000);
+    setInterval(fetchLatestInsight, 30000);
 });

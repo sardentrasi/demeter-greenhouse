@@ -20,7 +20,7 @@ from core.telegram_bot import run_telegram_bot, kirim_telegram_sync
 from core.database import (
     init_db, get_latest_history, get_sensor_timeseries, get_sensor_stats,
     get_daily_reports, insert_notification, get_unread_notifications, mark_notifications_read,
-    insert_growth_log, get_growth_logs
+    insert_growth_log, get_growth_logs, insert_chat_message, get_chat_history
 )
 
 load_dotenv()
@@ -84,7 +84,7 @@ def handle_report():
                     height = ai_result.get('estimated_height_cm', 0)
                     reasoning = ai_result.get("reason", "Manual Override Evaluated")
                     insert_growth_log(
-                        plant_name="Greenhouse System", 
+                        plant_name=core.state.PLANT_NAME, 
                         height=height, 
                         health=health, 
                         notes=f"[AUTO-LOG via /status] {reasoning}",
@@ -176,7 +176,7 @@ def handle_report():
                             health = ai_result.get('health_score', 'Good')
                             height = ai_result.get('estimated_height_cm', 0)
                             insert_growth_log(
-                                plant_name="Greenhouse System", 
+                                plant_name=core.state.PLANT_NAME, 
                                 height=height, 
                                 health=health, 
                                 notes=f"[AUTO-LOG via Analysis] {clean_reason}",
@@ -316,6 +316,53 @@ def api_post_growth_log():
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)}), 500
 
+@app.route('/api/insights/latest', methods=['GET'])
+@login_required
+def api_latest_insight():
+    logs = get_growth_logs(limit=1)
+    if not logs:
+        return jsonify({
+            'title': 'No insight yet',
+            'notes': 'Belum ada hasil analisa AI yang tersimpan. Jalankan scan untuk menghasilkan insight terbaru.',
+            'timestamp': None,
+            'plant_name': None,
+            'health': None,
+            'height': None,
+            'image_url': None,
+            'link': '/growth-log'
+        })
+
+    latest = logs[0]
+    raw_notes = (latest.get('notes') or '').strip()
+    clean_notes = raw_notes
+    for prefix in ('[AUTO-LOG via Analysis] ', '[AUTO-LOG via /status] '):
+        if clean_notes.startswith(prefix):
+            clean_notes = clean_notes[len(prefix):]
+
+    health = latest.get('health') or 'Unknown'
+    plant_name = latest.get('plant_name') or 'Greenhouse System'
+    timestamp = latest.get('timestamp')
+    height = latest.get('height')
+    title = f"{plant_name} - Health {health}"
+
+    img_path = latest.get('img_path')
+    image_url = None
+    if img_path:
+        image_name = os.path.basename(str(img_path))
+        if image_name:
+            image_url = url_for('serve_capture', filename=image_name)
+
+    return jsonify({
+        'title': title,
+        'notes': clean_notes or 'Insight tersedia tetapi belum ada catatan detail.',
+        'timestamp': timestamp,
+        'plant_name': plant_name,
+        'health': health,
+        'height': height,
+        'image_url': image_url,
+        'link': '/growth-log'
+    })
+
 
 # --- CLIMATIC DATA ---
 SENSOR_CONFIGS = {
@@ -397,33 +444,36 @@ def api_control_reset_cooldown():
 def settings_page():
     return render_template('settings.html', active_page='settings')
 
-@app.route('/api/settings', methods=['GET'])
+@app.route('/api/settings', methods=['GET', 'POST'])
 @login_required
-def api_get_settings():
+def api_settings():
+    if request.method == 'POST':
+        try:
+            data = request.get_json()
+            if 'moisture_safety_limit' in data:
+                core.state.MOISTURE_SAFETY_LIMIT = float(data['moisture_safety_limit'])
+            if 'hard_cooldown_hours' in data:
+                core.state.HARD_COOLDOWN_HOURS = float(data['hard_cooldown_hours'])
+            if 'soft_cooldown_hours' in data:
+                core.state.SOFT_COOLDOWN_HOURS = float(data['soft_cooldown_hours'])
+            if 'plant_name' in data:
+                core.state.PLANT_NAME = str(data['plant_name'])
+            
+            logger.info(f"[SETTINGS] Updated: plant={core.state.PLANT_NAME}, moisture={core.state.MOISTURE_SAFETY_LIMIT}, hard_cd={core.state.HARD_COOLDOWN_HOURS}h")
+            return jsonify({'success': True, 'message': 'Settings saved (runtime only).'})
+        except Exception as e:
+            logger.error(f"[SETTINGS ERROR] {e}")
+            return jsonify({'success': False, 'message': str(e)}), 400
+    
     return jsonify({
         'moisture_safety_limit': core.state.MOISTURE_SAFETY_LIMIT,
         'hard_cooldown_hours': core.state.HARD_COOLDOWN_HOURS,
         'soft_cooldown_hours': core.state.SOFT_COOLDOWN_HOURS,
-        'llm_model': os.getenv('LLM_BASE_MODEL', 'unknown'),
-        'db_path': DB_PATH,
-        'capture_dir': CAPTURE_DIR
+        'plant_name': core.state.PLANT_NAME,
+        'llm_model': core.state.LLM_BASE_MODEL,
+        'db_path': core.state.DB_PATH,
+        'capture_dir': core.state.CAPTURE_DIR
     })
-
-@app.route('/api/settings', methods=['POST'])
-@login_required
-def api_save_settings():
-    try:
-        data = request.json
-        if 'moisture_safety_limit' in data:
-            core.state.MOISTURE_SAFETY_LIMIT = float(data['moisture_safety_limit'])
-        if 'hard_cooldown_hours' in data:
-            core.state.HARD_COOLDOWN_HOURS = float(data['hard_cooldown_hours'])
-        if 'soft_cooldown_hours' in data:
-            core.state.SOFT_COOLDOWN_HOURS = float(data['soft_cooldown_hours'])
-        logger.info(f"[SETTINGS] Updated: moisture_limit={core.state.MOISTURE_SAFETY_LIMIT}, hard_cd={core.state.HARD_COOLDOWN_HOURS}h, soft_cd={core.state.SOFT_COOLDOWN_HOURS}h")
-        return jsonify({'success': True, 'message': 'Settings saved (runtime only).'})
-    except Exception as e:
-        return jsonify({'success': False, 'message': str(e)})
 
 # --- AI CHAT ---
 @app.route('/api/chat', methods=['POST'])
@@ -435,6 +485,9 @@ def api_chat():
         return jsonify({'reply': 'Please enter a message.'})
     
     try:
+        # Save user message to DB
+        insert_chat_message('user', user_msg)
+        
         # Load persona
         persona = "You are Demeter, the Garden AI."
         persona_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "persona_demeter.md")
@@ -462,6 +515,9 @@ def api_chat():
         )
         loop.close()
         
+        # Save AI reply to DB
+        insert_chat_message('ai', reply)
+
         # Record AI reply to memory
         if len(reply) > 20:
             core.state.global_brain.record(
@@ -475,6 +531,12 @@ def api_chat():
     except Exception as e:
         logger.error(f"[CHAT ERROR] {e}")
         return jsonify({'reply': f'⚠️ Communication error: {str(e)}'})
+
+@app.route('/api/chat/history', methods=['GET'])
+@login_required
+def api_chat_history():
+    history = get_chat_history(limit=50)
+    return jsonify(history)
 
 # --- NOTIFICATIONS ---
 @app.route('/api/notifications')

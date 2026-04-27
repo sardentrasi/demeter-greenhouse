@@ -21,6 +21,11 @@
 
         <div class="space-y-5">
             <div>
+                <label class="block text-[11px] font-bold uppercase tracking-widest text-[#454745] mb-2">Plant Name / Specimen</label>
+                <input type="text" id="set-plant-name" class="form-control" placeholder="Monstera Deliciosa Variegata">
+                <p class="text-[11px] font-semibold text-[#868685] mt-1">Displayed on Dashboard and Logs</p>
+            </div>
+            <div>
                 <label class="block text-[11px] font-bold uppercase tracking-widest text-[#454745] mb-2">Moisture Safety Limit (%)</label>
                 <input type="number" id="set-moisture-limit" class="form-control" placeholder="40" min="0" max="100">
                 <p class="text-[11px] font-semibold text-[#868685] mt-1">Below this → triggers AI analysis</p>
@@ -92,6 +97,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
         const res = await fetch('/api/settings');
         const data = await res.json();
+        document.getElementById('set-plant-name').value = data.plant_name || '';
         document.getElementById('set-moisture-limit').value = data.moisture_safety_limit;
         document.getElementById('set-hard-cooldown').value = data.hard_cooldown_hours;
         document.getElementById('set-soft-cooldown').value = data.soft_cooldown_hours;
@@ -108,6 +114,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
+                    plant_name: document.getElementById('set-plant-name').value,
                     moisture_safety_limit: parseFloat(document.getElementById('set-moisture-limit').value),
                     hard_cooldown_hours: parseFloat(document.getElementById('set-hard-cooldown').value),
                     soft_cooldown_hours: parseFloat(document.getElementById('set-soft-cooldown').value)

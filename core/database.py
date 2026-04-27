@@ -57,9 +57,20 @@ def init_db():
             )
         ''')
 
+        # Create chat history table
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS chat_history (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+                role TEXT NOT NULL,
+                message TEXT NOT NULL
+            )
+        ''')
+
         # Indexing for performance
         cursor.execute('CREATE INDEX IF NOT EXISTS idx_timestamp ON sensor_logs(timestamp)')
         cursor.execute('CREATE INDEX IF NOT EXISTS idx_notif_read ON notifications(is_read)')
+        cursor.execute('CREATE INDEX IF NOT EXISTS idx_chat_ts ON chat_history(timestamp)')
         
         conn.commit()
         conn.close()
@@ -286,4 +297,40 @@ def get_growth_logs(limit=50):
         return [dict(row) for row in rows]
     except Exception as e:
         logger.error(f"❌ Failed to fetch growth logs: {e}")
+        return []
+
+# ============================================
+# CHAT HISTORY
+# ============================================
+
+def insert_chat_message(role, message):
+    """Insert a new chat message (user or ai)."""
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute('''
+            INSERT INTO chat_history (role, message)
+            VALUES (?, ?)
+        ''', (role, message))
+        conn.commit()
+        conn.close()
+    except Exception as e:
+        logger.error(f"❌ Failed to insert chat message: {e}")
+
+def get_chat_history(limit=50):
+    """Get chat history sorted by time."""
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute('''
+            SELECT role, message, timestamp
+            FROM chat_history
+            ORDER BY timestamp ASC
+            LIMIT ?
+        ''', (limit,))
+        rows = cursor.fetchall()
+        conn.close()
+        return [dict(row) for row in rows]
+    except Exception as e:
+        logger.error(f"❌ Failed to fetch chat history: {e}")
         return []
