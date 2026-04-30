@@ -75,7 +75,7 @@ def handle_report():
                     log_data(moist, temp, action, img_path, humidity, co2)
                     
                     core.state.LATEST_DATA = {
-                        "moisture": moist, "temp": temp, "last_seen": current_time,
+                        "moisture": moist, "temp": temp, "humidity": humidity, "co2": co2, "last_seen": current_time,
                         "action": action, "status": status_msg
                     }
                     
@@ -99,7 +99,7 @@ def handle_report():
             except TimeoutError:
                 logger.warning("[BUSY] Server memproses perintah. Mengabaikan perintah baru.")
                 core.state.LATEST_DATA = {
-                    "moisture": moist, "temp": temp, "last_seen": current_time,
+                    "moisture": moist, "temp": temp, "humidity": humidity, "co2": co2, "last_seen": current_time,
                     "action": "DIAM", "status": "Server Busy"
                 }
                 kirim_telegram_sync("⚠️ Demeter sedang sibuk memproses analisa lain. Harap tunggu.")
@@ -112,7 +112,7 @@ def handle_report():
             status_msg = f"Cooldown (Wait {minutes_left}m)"
             
             core.state.LATEST_DATA = {
-                "moisture": moist, "temp": temp, "last_seen": current_time,
+                "moisture": moist, "temp": temp, "humidity": humidity, "co2": co2, "last_seen": current_time,
                 "action": "DIAM", "status": status_msg
             }
             return jsonify({"action": "DIAM", "duration_sec": 0})
